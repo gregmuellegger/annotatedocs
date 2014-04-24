@@ -28,6 +28,12 @@ setup(
     packages=find_packages(),
     include_package_data=True,
     scripts=['scripts/annotatedocs'],
+    install_requires=[
+        'logbook',
+        'sh',
+        'slumber',
+        #'click'
+    ],
     url='',
     license=u'Copyright by Gregor Müllegger',
     description='',
