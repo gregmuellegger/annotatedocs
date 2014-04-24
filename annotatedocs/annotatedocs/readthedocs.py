@@ -98,17 +98,22 @@ class Project(object):
         for line in stdout:
             log.debug('sphinx-build: {}'.format(line))
 
-    def setup(self, recreate=False):
+    def setup(self):
         '''
         Prepare all the steps that are needed before we can attempt a build.
         '''
 
-        if recreate:
-            shutil.rmtree(self.base_dir)
-
         self.setup_repository()
         self.setup_virtualenv()
         self.build_doctrees()
+
+    def cleanup(self):
+        '''
+        Delete all cached files that are needed to build the annotated docs.
+        '''
+
+        if os.path.exists(self.base_dir):
+            shutil.rmtree(self.base_dir)
 
 
 def get_project(slug):
