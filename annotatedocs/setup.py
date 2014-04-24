@@ -32,6 +32,8 @@ setup(
         'logbook',
         'sh',
         'slumber',
+        'Sphinx',
+        'virtualenv',
         #'click'
     ],
     url='',

@@ -6,4 +6,4 @@ from .readthedocs import get_project
 @click.argument('project', help='A read the docs project name.')
 def main(project):
     project = get_project(project)
-    project.checkout()
+    project.setup()
