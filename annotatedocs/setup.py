@@ -31,7 +31,7 @@ setup(
     url='',
     license=u'Copyright by Gregor Müllegger',
     description='',
-    long_description=read('../README.txt'),
+    long_description=read('README.rst'),
     classifiers=[],
     zip_safe=False,
 )
