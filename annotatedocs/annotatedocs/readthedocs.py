@@ -113,6 +113,7 @@ class Project(object):
         '''
 
         if os.path.exists(self.base_dir):
+            log.info('Cleaning up (i.e. deleting) {}'.format(self.base_dir))
             shutil.rmtree(self.base_dir)
 
 
