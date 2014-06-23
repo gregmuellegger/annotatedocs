@@ -30,6 +30,7 @@ setup(
     scripts=['scripts/annotatedocs'],
     install_requires=[
         'logbook',
+        'rdflib',
         'sh',
         'slumber',
         'Sphinx',

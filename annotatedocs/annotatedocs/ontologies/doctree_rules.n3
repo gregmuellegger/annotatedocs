@@ -1,0 +1,169 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix xml: <http://www.w3.org/XML/1998/namespace> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix : <http://gremu.net/documentation-ontology/#> .
+
+
+# If A contains B directly, then B hasParent A.
+:hasParent a owl:FunctionalProperty ;
+    rdfs:subPropertyOf :hasAncestor .
+
+# If A contains B directly, then A hasChild B.
+:hasChild owl:inverseOf :hasParent ;
+    rdfs:subPropertyOf :hasDescendant .
+
+# Transitive version of hasParent.
+:hasAncestor a owl:TransitiveProperty .
+
+# Transitive version of hasChild.
+:hasDescendant a owl:TransitiveProperty .
+
+
+# All text nodes that are inside a title element.
+:TitleText owl:equivalentClass [
+    a owl:Class ;
+    owl:intersectionOf (
+        :TextNode
+        [
+            a owl:Restriction ;
+            owl:onProperty :hasAncestor ;
+            owl:someValuesFrom :TitleElement
+        ]
+    )
+] .
+
+
+#
+# The base class for all elements in a document.
+#
+:Element a owl:Class .
+
+# Contains meta data about the documentation, like author, version, language, etc.
+:MetaElement rdfs:subClassOf :Element .
+
+# Contains content that is contains actual documentation.
+:ContentElement rdfs:subClassOf :Element .
+
+:ProseElement rdfs:subClassOf :ContentElement .
+
+:TitleElement rdfs:subClassOf :ProseElement .
+
+# Title elements.
+
+:Title rdfs:subClassOf :TitleElement .
+:Subtitle rdfs:subClassOf :TitleElement .
+:Rubric rdfs:subClassOf :TitleElement .
+
+# Bibliographic elements.
+
+:Docinfo rdfs:subClassOf :MetaElement .
+:Author rdfs:subClassOf :MetaElement .
+:Authors rdfs:subClassOf :MetaElement .
+:Organization rdfs:subClassOf :MetaElement .
+:Address rdfs:subClassOf :MetaElement .
+:Contact rdfs:subClassOf :MetaElement .
+:Version rdfs:subClassOf :MetaElement .
+:Revision rdfs:subClassOf :MetaElement .
+:Status rdfs:subClassOf :MetaElement .
+:Date rdfs:subClassOf :MetaElement .
+:Copyright rdfs:subClassOf :MetaElement .
+
+# Decorative elements.
+
+:Decoration rdfs:subClassOf :MetaElement .
+:Header rdfs:subClassOf :MetaElement .
+:Footer rdfs:subClassOf :MetaElement .
+
+# Structural elements.
+
+:Section rdfs:subClassOf :StructuralElement .
+:Topic rdfs:subClassOf :StructuralElement .
+:Sidebar rdfs:subClassOf :StructuralElement .
+:Transition rdfs:subClassOf :StructuralElement .
+
+# Body elements.
+
+:Paragraph rdfs:subClassOf :ContentElement .
+:Compound rdfs:subClassOf :ContentElement .
+:Container rdfs:subClassOf :ContentElement .
+:BulletList rdfs:subClassOf :ContentElement .
+:EnumeratedList rdfs:subClassOf :ContentElement .
+:ListItem rdfs:subClassOf :ContentElement .
+:DefinitionList rdfs:subClassOf :ContentElement .
+:DefinitionListItem rdfs:subClassOf :ContentElement .
+:Term rdfs:subClassOf :ContentElement .
+:Classifier rdfs:subClassOf :ContentElement .
+:Definition rdfs:subClassOf :ContentElement .
+:FieldList rdfs:subClassOf :ContentElement .
+:Field rdfs:subClassOf :ContentElement .
+:FieldName rdfs:subClassOf :ContentElement .
+:FieldBody rdfs:subClassOf :ContentElement .
+:Option rdfs:subClassOf :ContentElement .
+:OptionArgument rdfs:subClassOf :ContentElement .
+:OptionGroup rdfs:subClassOf :ContentElement .
+:OptionList rdfs:subClassOf :ContentElement .
+:OptionListItem rdfs:subClassOf :ContentElement .
+:OptionString rdfs:subClassOf :ContentElement .
+:Description rdfs:subClassOf :ContentElement .
+:LiteralBlock rdfs:subClassOf :ContentElement .
+:DoctestBlock rdfs:subClassOf :ContentElement .
+:MathBlock rdfs:subClassOf :ContentElement .
+:LineBlock rdfs:subClassOf :ContentElement .
+:Line rdfs:subClassOf :ContentElement .
+:Blockquote rdfs:subClassOf :ContentElement .
+:Attribution rdfs:subClassOf :ContentElement .
+:Attention rdfs:subClassOf :ContentElement .
+:Caution rdfs:subClassOf :ContentElement .
+:Danger rdfs:subClassOf :ContentElement .
+:Error rdfs:subClassOf :ContentElement .
+:Important rdfs:subClassOf :ContentElement .
+:Node rdfs:subClassOf :ContentElement .
+:Tip rdfs:subClassOf :ContentElement .
+:Hint rdfs:subClassOf :ContentElement .
+:Warning rdfs:subClassOf :ContentElement .
+:Admonition rdfs:subClassOf :ContentElement .
+:Comment rdfs:subClassOf :ContentElement .
+:SubstitutionDefinition rdfs:subClassOf :ContentElement .
+:Target rdfs:subClassOf :ContentElement .
+:Footnode rdfs:subClassOf :ContentElement .
+:Citation rdfs:subClassOf :ContentElement .
+:Label rdfs:subClassOf :ContentElement .
+:Figure rdfs:subClassOf :ContentElement .
+:Caption rdfs:subClassOf :ContentElement .
+:Legend rdfs:subClassOf :ContentElement .
+:Table rdfs:subClassOf :ContentElement .
+:TableGroup rdfs:subClassOf :ContentElement .
+:Colspec rdfs:subClassOf :ContentElement .
+:TableHead rdfs:subClassOf :ContentElement .
+:TableBody rdfs:subClassOf :ContentElement .
+:Pending rdfs:subClassOf :ContentElement .
+:Entry rdfs:subClassOf :ContentElement .
+:SystemMessage rdfs:subClassOf :ContentElement .
+:Pending rdfs:subClassOf :ContentElement .
+:Raw rdfs:subClassOf :ContentElement .
+
+# Inline elements
+
+:Emphasis rdfs:subClassOf :ContentElement .
+:Strong rdfs:subClassOf :ContentElement .
+:Literal rdfs:subClassOf :ContentElement .
+:Reference rdfs:subClassOf :ContentElement .
+:FootnoteReference rdfs:subClassOf :ContentElement .
+:CitationReference rdfs:subClassOf :ContentElement .
+:SubstitutionReference rdfs:subClassOf :ContentElement .
+:TitleReference rdfs:subClassOf :ContentElement .
+:Abbreviation rdfs:subClassOf :ContentElement .
+:Acronym rdfs:subClassOf :ContentElement .
+:Superscript rdfs:subClassOf :ContentElement .
+:Subscript rdfs:subClassOf :ContentElement .
+:Math rdfs:subClassOf :ContentElement .
+:Image rdfs:subClassOf :ContentElement .
+:Inline rdfs:subClassOf :ContentElement .
+:Problematic rdfs:subClassOf :ContentElement .
+:Generated rdfs:subClassOf :ContentElement .
+
+# Actual text nodes.
+
+:Text rdfs:subClassOf :TextNode .
