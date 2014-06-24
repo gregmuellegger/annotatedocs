@@ -1,0 +1,113 @@
+#!/usr/bin/env python
+'''
+Query RDF data with SPARQL. Takes an RDF file as input and outputs the query
+result as CSV.
+'''
+
+import argparse
+import sys
+from rdflib import Graph
+
+
+main_parser = argparse.ArgumentParser(
+    description=__doc__)
+
+
+main_parser.add_argument(
+    'query',
+    help='A SPARQL query. Use the --queryfile option if you want to read the query from a file.',
+    type=unicode, nargs='?')
+main_parser.add_argument(
+    'input_file',
+    help='The RDF file to read from. Defaults to stdin.',
+    nargs=1, type=argparse.FileType('r'))
+main_parser.add_argument(
+    '-q', '--query-file',
+    help='A file containing the SPARQL query.',
+    dest='queryfile', nargs='?', type=argparse.FileType('r'))
+main_parser.add_argument(
+    '-f', '--input-format',
+    help='The format in which the input is in. Defaults to "turtle".',
+    dest='informat', nargs='?', default='turtle')
+main_parser.add_argument(
+    '-o', '--output-file',
+    help='The file the output shall be written to. Defaults to stdout.',
+    dest='outfile', nargs='?', default=sys.stdout, type=argparse.FileType('w'))
+main_parser.add_argument(
+    '-r', '--rdf',
+    help='Output rdf triples. This will only work if you queried for three variables.',
+    dest='rdf', default=False, action='store_true')
+main_parser.add_argument(
+    '--output-format',
+    help='The output format if --rdf is used.',
+    dest='outformat', nargs='?', default='turtle')
+main_parser.add_argument(
+    '--no-error',
+    help='Usually exits with code 1 if no results are found for the given queries. If --no-error is given, the script exits with 0.',
+    dest='error_on_no_results', default=True, action='store_false')
+
+
+def format_table(table):
+    col_width = [max(len(x) for x in col) for col in zip(*table)]
+    output = []
+    for line in table:
+        formatted_row = ",".join(
+            "{:{}}".format(col, col_width[i])
+            for i, col in enumerate(line))
+        output.append(formatted_row)
+    output = '\n'.join(output)
+    if output:
+        output += '\n'
+    return output
+
+
+def format_result(result):
+    rows = []
+    for row in result:
+        line = []
+        for field in row:
+            line.append(
+                '<{}>'.format(field))
+        rows.append(line)
+    return format_table(rows)
+
+
+def print_graph(stream, result, format, namespaces=()):
+    graph = Graph()
+    for prefix, namespace in namespaces:
+        graph.bind(prefix, namespace)
+    for row in result:
+        if len(row) != 3:
+            raise Exception('You must query for 3 parameters if you want to serialize to RDF.')
+        graph.add(row)
+    graph.serialize(stream, format=format)
+
+
+def main(argv):
+    args = main_parser.parse_args(argv)
+    graph = Graph()
+    graph.parse(args.input_file[0], format=args.informat)
+    count = 0
+    assert args.query or args.queryfile
+    if args.queryfile:
+        query = args.queryfile.read()
+    else:
+        query = args.query
+
+    result = graph.query(query)
+    count += len(result)
+    if not args.rdf:
+        args.outfile.write(
+            format_result(result))
+    else:
+        print_graph(
+            args.outfile,
+            result,
+            args.outformat,
+            namespaces=graph.namespaces())
+    if args.error_on_no_results and count == 0:
+        sys.exit(1)
+
+
+if __name__ == '__main__':
+    main(sys.argv[1:])

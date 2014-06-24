@@ -7,7 +7,7 @@ import sh
 import shutil
 import slumber
 
-from . import doctree
+from . import doctree2rdf
 from .builder import AnnotatedHTMLBuilder
 from .utils import cd
 
@@ -21,18 +21,19 @@ api = slumber.API(base_url='http://readthedocs.org/api/v1/')
 class Project(object):
     dependencies = ['Sphinx']
 
-    def __init__(self, slug, repository, file_suffix, install_python_package,
+    def __init__(self, base_dir, slug, repository, file_suffix, install_python_package,
             pip_requirements_file):
+        self.base_dir = base_dir
         self.slug = slug
         self.repository_url = repository
         self.file_suffix = file_suffix
         self.install_python_package = install_python_package
         self.pip_requirements_file = pip_requirements_file
 
-        self.base_dir = os.path.join('/tmp', 'annotatedocs', slug)
-        self.repository_dir = os.path.join(self.base_dir, 'repo')
-        self.virtualenv_dir = os.path.join(self.base_dir, 'venv')
-        self.build_dir = os.path.join(self.base_dir, 'build')
+        self.project_dir = os.path.join(self.base_dir, slug)
+        self.repository_dir = os.path.join(self.project_dir, 'repo')
+        self.virtualenv_dir = os.path.join(self.project_dir, 'venv')
+        self.build_dir = os.path.join(self.project_dir, 'build')
         self.doctrees_dir = os.path.join(self.build_dir, 'doctrees')
         self.build_html_dir = os.path.join(self.build_dir, 'html')
         self.build_annotated_html_dir = os.path.join(self.build_dir, 'annotated')
@@ -129,9 +130,9 @@ class Project(object):
         Delete all cached files that are needed to build the annotated docs.
         '''
 
-        if os.path.exists(self.base_dir):
-            log.info('Cleaning up (i.e. deleting) {}'.format(self.base_dir))
-            shutil.rmtree(self.base_dir)
+        if os.path.exists(self.project_dir):
+            log.info('Cleaning up (i.e. deleting) {}'.format(self.project_dir))
+            shutil.rmtree(self.project_dir)
 
     def get_documents(self):
         exists = os.path.exists(self.doctrees_dir)
@@ -146,14 +147,14 @@ class Project(object):
                     with open(doctree_path, 'r') as f:
                         document_name = os.path.join(self.repository_url, file_path)
                         doctrees.append(
-                            doctree.load(
+                            doctree2rdf.load(
                                 f,
                                 {'document_name': document_name}))
         return doctrees
 
     def get_graph(self, raw=False):
         graph = Graph()
-        graph += doctree.get_ontology()
+        graph += doctree2rdf.get_ontology()
         for document in self.get_documents():
             graph += document.get_graph()
         return graph
@@ -170,7 +171,7 @@ class Project(object):
         app.build(force_all=True)
 
 
-def get_project(slug):
+def get_project(slug, **kwargs):
     data = api.project.get(slug=slug)
 
     assert data['meta']['total_count'] == 1, 'Project not found.'
@@ -186,4 +187,4 @@ def get_project(slug):
         file_suffix=project_data['suffix'],
         install_python_package=project_data['use_virtualenv'],
         pip_requirements_file=project_data['requirements_file'],
-    )
+        **kwargs)

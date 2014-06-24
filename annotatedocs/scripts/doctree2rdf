@@ -1,0 +1,39 @@
+from signal import signal, SIGPIPE, SIG_DFL
+import sys
+
+from logbook import NullHandler, StreamHandler
+import click
+
+from annotatedocs import doctree2rdf, reasoner
+
+
+@click.command()
+@click.argument('doctree_file', type=click.File('r'))
+@click.argument('output', type=click.File('w'), default=sys.stdout)
+@click.option('-f', '--format', default='turtle')
+@click.option('--debug/--no-debug', is_flag=True, help='Show debug output.')
+def main(doctree_file, output, format, debug):
+
+    # Ignore SIG_PIPE so that piping works correctly.
+    signal(SIGPIPE, SIG_DFL)
+
+    if debug:
+        log_level = 'DEBUG'
+    else:
+        log_level = 'INFO'
+
+    null_handler = NullHandler(level='DEBUG')
+    log_handler = StreamHandler(sys.stderr, level=log_level)
+    with null_handler.applicationbound():
+        with log_handler.applicationbound():
+
+            parser = doctree2rdf.load(doctree_file)
+            graph = parser.get_graph()
+            graph += doctree2rdf.get_ontology()
+            reasoner.owlrl(graph)
+
+            graph.serialize(output, format=format)
+
+
+if __name__ == '__main__':
+    main()

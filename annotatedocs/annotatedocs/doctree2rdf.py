@@ -10,6 +10,7 @@ import pickle
 from docutils import nodes
 from rdflib import Graph, Namespace, Literal
 from rdflib import RDF, RDFS, OWL
+from annotatedocs.vendored.nltk_contrib.readability.readabilitytests import ReadabilityTool
 from .reasoner import owlrl
 
 
@@ -100,6 +101,30 @@ class RDFVisitor(nodes.NodeVisitor):
             Literal(node.astext())
         ))
 
+        # NODE O:hasTextLength 4
+        text = node.astext()
+        text_length = len(text)
+        self.graph.add((
+            self.get_uri(node),
+            O.hasTextLength,
+            Literal(text_length)
+        ))
+
+        # Disable warnings emitted by ReadabilityTool.
+        logging.disable(logging.WARNING)
+        readability_text = ReadabilityTool()
+        readability_text.lang = 'eng'
+        score = readability_text.FleschReadingEase(text.encode('utf-8'))
+        logging.disable(logging.NOTSET)
+
+        # NODE O.hasFleschReadingEase 80.1
+        self.graph.add((
+            self.get_uri(node),
+            O.hasFleschReadingEase,
+            Literal(score)
+        ))
+
+
     def _visit_node_type(type):
         def visit_node(self, node):
             self.add_node(node, type=type)
@@ -155,7 +180,10 @@ class RDFVisitor(nodes.NodeVisitor):
     visit_transition = _visit_node_type('Transition')
 
     # Body elements
-    visit_paragraph = _visit_node_type('Paragraph')
+    def visit_paragraph(self, node):
+        self.add_node(node, type='Paragraph')
+        self.add_text(node)
+
     visit_compound = _visit_node_type('Compound')
     visit_container = _visit_node_type('Container')
     visit_bullet_list = _visit_list_type('BulletList')
@@ -238,13 +266,6 @@ class RDFVisitor(nodes.NodeVisitor):
     def visit_Text(self, node):
         self.add_node(node, type='Text')
         self.add_text(node)
-
-        text_length = len(node.astext())
-        self.graph.add((
-            self.get_uri(node),
-            O.hasTextLength,
-            Literal(text_length)
-        ))
 
     # Clean up helpers
     del _visit_node_type

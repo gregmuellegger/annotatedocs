@@ -27,15 +27,21 @@ setup(
     author_email='gregor@muellegger.de',
     packages=find_packages(),
     include_package_data=True,
-    scripts=['scripts/annotatedocs'],
+    scripts=[
+        'scripts/annotatedocs',
+        'scripts/doctree2rdf',
+        'scripts/rdfquery',
+        'scripts/rdfconcat',
+    ],
     install_requires=[
+        'click>=2.0'
         'logbook',
+        'nltk',
         'rdflib',
         'sh',
         'slumber',
         'Sphinx',
         'virtualenv',
-        #'click'
     ],
     url='',
     license=u'Copyright by Gregor Müllegger',
