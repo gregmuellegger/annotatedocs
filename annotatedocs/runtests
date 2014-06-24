@@ -1,0 +1,11 @@
+#!/bin/bash
+
+pushd `dirname $0` > /dev/null
+SCRIPTPATH=`pwd`
+popd > /dev/null
+
+cd $SCRIPTPATH/tests/sampledocs
+make html
+
+cd $SCRIPTPATH
+py.test tests/

@@ -1,0 +1,15 @@
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix : <http://gremu.net/labels/> .
+
+
+:Article rdfs:subClassOf :Document . 
+:Document rdfs:subClassOf :ContentItem .
+
+:item1 a :Article .
+
+:author
+    rdfs:domain :Person ;
+    rdfs:range :ContentItem .
+
+:alexdma :author :item1 .
