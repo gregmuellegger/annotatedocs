@@ -8,7 +8,8 @@ import shutil
 import slumber
 
 from . import doctree2rdf
-from .builder import AnnotatedHTMLBuilder
+from . import reasoner
+from .builder import AnnotatedSphinx
 from .utils import cd
 
 
@@ -160,14 +161,12 @@ class Project(object):
         return graph
 
     def build(self):
-        from sphinx.application import Sphinx
-        app = Sphinx(
+        app = AnnotatedSphinx(
             srcdir=self.docs_dir,
             confdir=self.docs_dir,
             outdir=self.build_annotated_html_dir,
             doctreedir=self.doctrees_dir,
             buildername='html')
-        app.builder = AnnotatedHTMLBuilder(app)
         app.build(force_all=True)
 
 

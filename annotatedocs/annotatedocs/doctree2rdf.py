@@ -21,20 +21,9 @@ O = ONTOLOGY_NAMESPACE
 logger = logging.getLogger(__name__)
 
 
-class RDFVisitor(nodes.NodeVisitor):
-    '''
-    Takes care of transforming a node into RDF data.
-
-    For supported node types see the visit_* method definitions.
-
-    Unsupported nodes will have a type of ``d:UnknownNodeType``.
-    '''
-
-    def __init__(self, document, graph, element_namespace):
-        self.document = document
-        self.graph = graph
-        self.node_count = 0
-        self.element_namespace = element_namespace
+class NodeIDMixin(object):
+    def __init__(self, *args, **kwargs):
+        super(NodeIDMixin, self).__init__(*args, **kwargs)
         self.id_map = {}
 
     def get_id(self, node):
@@ -54,6 +43,23 @@ class RDFVisitor(nodes.NodeVisitor):
             return self.element_namespace['Document']
         node_id = self.get_id(node)
         return self.element_namespace['E{}'.format(node_id)]
+
+
+class RDFVisitor(NodeIDMixin, nodes.NodeVisitor):
+    '''
+    Takes care of transforming a node into RDF data.
+
+    For supported node types see the visit_* method definitions.
+
+    Unsupported nodes will have a type of ``d:UnknownNodeType``.
+    '''
+
+    def __init__(self, document, graph, element_namespace):
+        self.graph = graph
+        self.node_count = 0
+        self.element_namespace = element_namespace
+        NodeIDMixin.__init__(self)
+        nodes.NodeVisitor.__init__(self, document)
 
     def unknown_visit(self, node):
         self.document.reporter.info(
@@ -93,16 +99,25 @@ class RDFVisitor(nodes.NodeVisitor):
                 O.isChildNumber,
                 Literal(child_index)))
 
+    def get_unicode(self, text):
+        try:
+            text = text.decode('utf-8')
+        except UnicodeEncodeError:
+            ascii_text = ''.join([c for c in text if ord(c) < 128])
+            text = ascii_text.decode('utf-8')
+        assert type(text) == unicode
+        return text
+
     def add_text(self, node):
         # NODE rdfs:label "Text"
+        text = self.get_unicode(node.astext())
         self.graph.add((
             self.get_uri(node),
             RDFS.label,
-            Literal(node.astext())
+            Literal(text)
         ))
 
         # NODE O:hasTextLength 4
-        text = node.astext()
         text_length = len(text)
         self.graph.add((
             self.get_uri(node),
@@ -114,18 +129,22 @@ class RDFVisitor(nodes.NodeVisitor):
         logging.disable(logging.WARNING)
         readability_text = ReadabilityTool()
         readability_text.lang = 'eng'
-        score = readability_text.FleschReadingEase(text.encode('utf-8'))
+        try:
+            score = readability_text.FleschReadingEase(text.encode('utf-8'))
+        except ZeroDivisionError:
+            score = None
         logging.disable(logging.NOTSET)
 
-        # NODE O.hasFleschReadingEase 80.1
-        self.graph.add((
-            self.get_uri(node),
-            O.hasFleschReadingEase,
-            Literal(score)
-        ))
+        if score is not None:
+            # NODE O.hasFleschReadingEase 80.1
+            self.graph.add((
+                self.get_uri(node),
+                O.hasFleschReadingEase,
+                Literal(score)
+            ))
 
 
-    def _visit_node_type(type):
+    def _visit_node_type(type, modifier=None):
         def visit_node(self, node):
             self.add_node(node, type=type)
         return visit_node
@@ -138,6 +157,12 @@ class RDFVisitor(nodes.NodeVisitor):
                 O.hasListLength,
                 Literal(len(node))
             ))
+        return visit_node
+
+    def _visit_text_type(type):
+        def visit_node(self, node):
+            self.add_node(node, type=type)
+            self.add_text(node)
         return visit_node
 
     # Root element
@@ -180,15 +205,13 @@ class RDFVisitor(nodes.NodeVisitor):
     visit_transition = _visit_node_type('Transition')
 
     # Body elements
-    def visit_paragraph(self, node):
-        self.add_node(node, type='Paragraph')
-        self.add_text(node)
+    visit_paragraph = _visit_text_type('Paragraph')
 
     visit_compound = _visit_node_type('Compound')
     visit_container = _visit_node_type('Container')
     visit_bullet_list = _visit_list_type('BulletList')
     visit_enumerated_list = _visit_list_type('EnumeratedList')
-    visit_list_item = _visit_node_type('ListItem')
+    visit_list_item = _visit_text_type('ListItem')
     visit_definition_list = _visit_list_type('DefinitionList')
     visit_definition_list_item = _visit_node_type('DefinitionListItem')
     visit_term = _visit_node_type('Term')
@@ -287,7 +310,7 @@ class Doctree2RDF(object):
     def __init__(self, document, document_name='document://'):
         self.document = document
         self.document_name = document_name
-        self.document_namespace = Namespace('{0}#'.format(self.document_name))
+        self.document_namespace = Namespace(self.document_name)
 
     def rdf_for_node(self, node):
         return str(node.__class__)
@@ -299,7 +322,6 @@ class Doctree2RDF(object):
 
     def bind_namespaces(self, graph):
         graph.bind('d', ONTOLOGY_NAMESPACE)
-        graph.bind('f', self.document_namespace)
         graph.bind('owl', OWL)
 
     def get_graph(self):
@@ -312,7 +334,7 @@ class Doctree2RDF(object):
         '''
         graph = Graph()
         self.bind_namespaces(graph)
-        visitor = RDFVisitor(
+        visitor = self.visitor_class(
             self.document,
             graph,
             self.document_namespace)
@@ -330,6 +352,15 @@ def get_ontology():
     graph = Graph()
     with open(path, 'r') as file:
         graph.parse(file, format='n3')
+    return graph
+
+
+def get_graph(document, reason=True):
+    parser = Doctree2RDF(document)
+    graph = parser.get_graph()
+    graph += get_ontology()
+    if reason:
+        owlrl(graph)
     return graph
 
 

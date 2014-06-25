@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import os
+import requests
 from StringIO import StringIO
 from rdflib import Graph
 
@@ -26,14 +27,35 @@ def normalize_to_graph(content, format='turtle'):
 
 
 def owlrl(graph):
+#
+#    graph += get_inferred(graph)
+#    return
+
     from RDFClosure.OWLRLExtras import OWLRL_Extension_Trimming
-    from RDFClosure import DeductiveClosure
+    from RDFClosure import DeductiveClosure, return_closure_class
 
     closure = DeductiveClosure(
-        OWLRL_Extension_Trimming,
-        improved_datatypes=False,
+        return_closure_class(
+            owl_closure=True,
+            rdfs_closure=True,
+            owl_extras=False,
+            trimming=True),
+        improved_datatypes=True,
         rdfs_closure=True,
         axiomatic_triples=False,
         datatype_axioms=False)
 
     closure.expand(graph)
+
+
+def get_inferred(graph):
+    buf = StringIO()
+    data = graph.serialize(buf, format='turtle')
+    response = requests.post(
+        'http://localhost:8080/damuellegger/rest/enrichrdf/infer',
+        data=data)
+    assert response.status_code == 200
+    buf = StringIO(response.content)
+    inferred = Graph()
+    inferred.parse(buf, format='turtle')
+    return inferred
