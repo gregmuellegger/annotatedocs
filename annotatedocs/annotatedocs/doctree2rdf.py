@@ -8,7 +8,7 @@ import logging
 import os
 import pickle
 from docutils import nodes
-from rdflib import Graph, Namespace, Literal
+from rdflib import Graph, Namespace, Literal, BNode
 from rdflib import RDF, RDFS, OWL
 from annotatedocs.vendored.nltk_contrib.readability.readabilitytests import ReadabilityTool
 from .reasoner import owlrl
@@ -142,7 +142,33 @@ class RDFVisitor(NodeIDMixin, nodes.NodeVisitor):
                 O.hasFleschReadingEase,
                 Literal(score)
             ))
+            if node.__class__.__name__ == 'paragraph':
+                if 0 < score < 60:
+                    self.add_warning(node, 'This paragraph has a bad readingscore: {0}'.format(score))
 
+    def add_annotation(self, node, level, message):
+        annotation = BNode()
+        self.graph.add((
+            self.get_uri(node),
+            O.hasAnnotation,
+            annotation
+        ))
+        self.graph.add((
+            annotation,
+            RDF.type,
+            level
+        ))
+        self.graph.add((
+            annotation,
+            RDFS.label,
+            Literal(message)
+        ))
+
+    def add_hint(self, node, message):
+        self.add_annotation(node, O.Hint, message)
+
+    def add_warning(self, node, message):
+        self.add_annotation(node, O.Warning, message)
 
     def _visit_node_type(type, modifier=None):
         def visit_node(self, node):

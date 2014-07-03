@@ -168,6 +168,13 @@ class Project(object):
             doctreedir=self.doctrees_dir,
             buildername='html')
         app.build(force_all=True)
+        index_file = os.path.join(
+            self.build_annotated_html_dir,
+            'index.html')
+        log.info(
+            'Build finished. Open file://{path} in your browser to see the '
+            'annotations.'.format(path=index_file)
+        )
 
 
 def get_project(slug, **kwargs):

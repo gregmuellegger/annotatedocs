@@ -13,7 +13,7 @@ from .main import annotate
 @click.option('-r', '--recreate/--no-recreate', is_flag=True, help='Recreate all cached files.')
 @click.option('--rdf', is_flag=True, help='Show RDF of doctree files and exit.')
 @click.option('--debug/--no-debug', is_flag=True, help='Show debug output.')
-@click.option('-d', '--tmp-dir', type=click.Path(), default='/tmp/annotatedocs', help='Set working directory in which the projects shall be downloaded.')
+@click.option('--tmp-dir', type=click.Path(), default='/tmp/annotatedocs', help='Set working directory in which the projects shall be downloaded.')
 def main(project, recreate, rdf, debug, tmp_dir):
 
     # Ignore SIG_PIPE so that piping works correctly.

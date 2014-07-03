@@ -1,6 +1,7 @@
 import json
 
 from rdflib import Graph, Namespace
+from rdflib import RDF, RDFS, OWL
 import sphinx_rtd_theme_annotated
 from sphinx.application import Sphinx
 from sphinx.writers.html import HTMLTranslator
@@ -28,27 +29,42 @@ class AnnotatedHTMLTranslator(NodeIDMixin, HTMLTranslator):
         else:
             self.annotate = False
 
-    def get_value(self, node, prop):
-        uri = self.get_uri(node)
-        result = list(self.annotation_graph.triples((
-            uri,
+    def get_values(self, subject, prop):
+        triples = list(self.annotation_graph.triples((
+            subject,
             prop,
             None)))
-        if not result:
-            return None
-        return result[0][2]
+        return [o for s, p, o in triples]
+
+    def get_node_values(self, node, prop):
+        subject = self.get_uri(node)
+        return self.get_values(subject, prop)
+
+    def get_value(self, subject, prop):
+        values = self.get_values(subject, prop)
+        assert len(values) == 1, '{0} != 1'.format(len(values))
+        return values[0]
 
     def get_annotations(self, node):
-        fleschreadingease = self.get_value(node, O.hasFleschReadingEase)
+        annotation_objects = self.get_node_values(node, O.hasAnnotation)
         annotations = []
-        if fleschreadingease is not None:
-            annotations.append({
-                'type': 'fleschreadingease',
-                'data': {
-                    'score': fleschreadingease,
-                },
-                'message': 'fleschreadingease: {}'.format(fleschreadingease)
-            })
+        for subject in annotation_objects:
+            is_hint = (subject, RDF.type, O.Hint) in self.annotation_graph
+            is_warning = (subject, RDF.type, O.Warning) in self.annotation_graph
+
+            level = 'unkown'
+            if is_hint:
+                level = 'hint'
+            if is_warning:
+                level = 'warning'
+
+            messages = self.get_values(subject, RDFS.label)
+            message = ' '.join(messages)
+            if message:
+                annotations.append({
+                    'level': level,
+                    'message': message
+                })
         return annotations
 
     def starttag(self, node, tagname, suffix='\n', empty=False, **attributes):
