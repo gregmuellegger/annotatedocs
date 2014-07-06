@@ -1,20 +1,38 @@
+import hashlib
 from signal import signal, SIGPIPE, SIG_DFL
 import sys
 
 from logbook import NullHandler, StreamHandler
 import click
 
-from .project import get_project
-from .main import annotate
+from .loader import get_project_loader
+from .project import Project
+
+
+def get_token(string):
+    return hashlib.sha1(string).hexdigest()
 
 
 @click.command()
-@click.argument('project')
+@click.argument('docs', type=click.Path(), default='.')
+@click.option('-b', '--build-dir', type=click.Path(), default=None, help='Set build directory in which the annotated html shall be placed.')
+@click.option('--tmp-dir', type=click.Path(), default=None, help='Set working directory in which the projects shall be downloaded.')
 @click.option('-r', '--recreate/--no-recreate', is_flag=True, help='Recreate all cached files.')
-@click.option('--rdf', is_flag=True, help='Show RDF of doctree files and exit.')
 @click.option('--debug/--no-debug', is_flag=True, help='Show debug output.')
-@click.option('--tmp-dir', type=click.Path(), default='/tmp/annotatedocs', help='Set working directory in which the projects shall be downloaded.')
-def main(project, recreate, rdf, debug, tmp_dir):
+def main(docs, build_dir, tmp_dir, recreate, debug):
+    '''
+    annotatedocs analyzes your sphinx-based documentation and provides helpful
+    feedback about the quality and possible improvements.
+
+    The first argument should be the path to where your documentation lives
+    (e.g. the one in which you usually call 'make html').
+
+    If you leave the first argument empty it defaults to the current working
+    directory.
+
+    The build will usually be written to <your docs dir>/_build/annotatedhtml/.
+    You can change the output directory with the -b option.
+    '''
 
     # Ignore SIG_PIPE so that piping works correctly.
     signal(SIGPIPE, SIG_DFL)
@@ -28,10 +46,14 @@ def main(project, recreate, rdf, debug, tmp_dir):
     log_handler = StreamHandler(sys.stderr, level=log_level)
     with null_handler.applicationbound():
         with log_handler.applicationbound():
-            project = get_project(project, base_dir=tmp_dir)
+
+            loader = get_project_loader(docs,
+                                        build_dir=build_dir,
+                                        tmp_dir=tmp_dir)
+
+            project = Project(loader)
+
             if recreate:
                 project.cleanup()
             project.setup()
-            if rdf:
-                annotate(project)
             project.build()

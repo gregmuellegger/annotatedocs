@@ -1,21 +1,18 @@
 import json
 
-from rdflib import Graph, Namespace
-from rdflib import RDF, RDFS, OWL
+from rdflib import Graph
 import sphinx_rtd_theme_annotated
 from sphinx.application import Sphinx
 from sphinx.writers.html import HTMLTranslator
 from sphinx.builders.html import StandaloneHTMLBuilder
 from sphinx.util.console import darkgreen
 
-from . import doctree2rdf, reasoner
-from .doctree2rdf import O
-from .doctree2rdf import NodeIDMixin
+from . import doctree2rdf
+from .data import AnnotationData
 
 
-class AnnotatedHTMLTranslator(NodeIDMixin, HTMLTranslator):
+class AnnotatedHTMLTranslator(HTMLTranslator):
     def __init__(self, builder, document):
-        NodeIDMixin.__init__(self)
         HTMLTranslator.__init__(self, builder, document)
 
         # If the document was not passed to the builder with a name, means that
@@ -23,56 +20,58 @@ class AnnotatedHTMLTranslator(NodeIDMixin, HTMLTranslator):
         docname = builder.docnames_by_doctree.get(document, None)
         if docname:
             self.annotate = True
-            namespace_name = builder.get_namespace_name(docname)
-            self.element_namespace = Namespace(namespace_name)
-            self.annotation_graph = builder.annotation_graph
+            self.annotation_data = builder.annotation_data
         else:
             self.annotate = False
 
-    def get_values(self, subject, prop):
-        triples = list(self.annotation_graph.triples((
-            subject,
-            prop,
-            None)))
-        return [o for s, p, o in triples]
-
-    def get_node_values(self, node, prop):
-        subject = self.get_uri(node)
-        return self.get_values(subject, prop)
-
-    def get_value(self, subject, prop):
-        values = self.get_values(subject, prop)
-        assert len(values) == 1, '{0} != 1'.format(len(values))
-        return values[0]
-
     def get_annotations(self, node):
-        annotation_objects = self.get_node_values(node, O.hasAnnotation)
-        annotations = []
-        for subject in annotation_objects:
-            is_hint = (subject, RDF.type, O.Hint) in self.annotation_graph
-            is_warning = (subject, RDF.type, O.Warning) in self.annotation_graph
+        data = self.annotation_data[node]
+        return data.get('annotations', [])
 
-            level = 'unkown'
-            if is_hint:
-                level = 'hint'
-            if is_warning:
-                level = 'warning'
+    def is_first_visible_node(self, node):
+        '''
+        Determine if the given node will the first rendered one in the
+        document. That is the case if the parent is the document node, and the
+        node is the first child of the document.
+        '''
+        return (
+            node.parent is node.document and
+            node.parent.index(node) == 0)
 
-            messages = self.get_values(subject, RDFS.label)
-            message = ' '.join(messages)
-            if message:
-                annotations.append({
-                    'level': level,
-                    'message': message
-                })
-        return annotations
+    def get_global_annotations(self, node):
+        if self.is_first_visible_node(node):
+#            return self.annotation_data.get_global_annotations()
+            annotations = [{
+                'level': 'warning',
+                'message': 'This is a global warning'
+            }]
+            return annotations
+
+    def get_document_annotations(self, node):
+        if self.is_first_visible_node(node):
+            return self.get_annotations(node.document)
+
+    def apply_annotations(self, node):
+        attributes = {}
+        global_annotations = self.get_global_annotations(node)
+        if global_annotations:
+            attributes['data-global-annotations'] = json.dumps(global_annotations)
+
+        document_annotations = self.get_document_annotations(node)
+        if document_annotations:
+            attributes['data-document-annotations'] = json.dumps(document_annotations)
+
+        annotations = self.get_annotations(node)
+        if annotations:
+            attributes['data-annotations'] = json.dumps(annotations)
+        return attributes
 
     def starttag(self, node, tagname, suffix='\n', empty=False, **attributes):
         if self.annotate:
-            annotations = self.get_annotations(node)
-            if annotations:
-                attributes['data-annotations'] = json.dumps(annotations)
-        return HTMLTranslator.starttag(self, node, tagname, suffix=suffix, empty=empty, **attributes)
+            attributes.update(
+                self.apply_annotations(node))
+        return HTMLTranslator.starttag(self, node, tagname, suffix=suffix,
+                                       empty=empty, **attributes)
 
 
 class AnnotatedHTMLBuilder(StandaloneHTMLBuilder):
@@ -101,7 +100,16 @@ class AnnotatedHTMLBuilder(StandaloneHTMLBuilder):
 
     def prepare_annotation_data(self, doctrees_by_docname):
         self.doctrees_by_docname = doctrees_by_docname
-        self.docnames_by_doctree = dict((doctree, docname) for docname, doctree in doctrees_by_docname.items())
+        self.docnames_by_doctree = dict(
+            (doctree, docname)
+            for docname, doctree in doctrees_by_docname.items())
+
+        self.annotation_data = AnnotationData()
+        for docname, doctree in self.doctrees_by_docname.items():
+            self.annotation_data.add_document(doctree, docname)
+
+        return
+
         graph = Graph()
         for docname, doctree in self.doctrees_by_docname.items():
             namespace_name = self.get_namespace_name(docname)
