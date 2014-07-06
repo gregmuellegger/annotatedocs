@@ -42,6 +42,7 @@ setup(
         'slumber',
         'Sphinx',
         'virtualenv',
+        'sphinx_rtd_theme_annotated',
     ],
     url='',
     license=u'Copyright by Gregor Müllegger',

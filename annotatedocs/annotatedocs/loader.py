@@ -1,3 +1,4 @@
+import hashlib
 import os
 import re
 import tempfile
@@ -39,7 +40,7 @@ class Loader(object):
     '''
 
     conf_file = 'conf.py'
-    dependencies = ['Sphinx']
+    dependencies = []
 
     def __init__(self, path, build_dir=None, tmp_dir=None):
         self.path = path
@@ -84,7 +85,9 @@ class Loader(object):
         self.doctrees_dir = os.path.join(self.get_tmp_dir(), 'doctrees')
 
         self.setup_project()
-        self.setup_virtualenv()
+        if self.use_virtualenv():
+            self.setup_virtualenv()
+            self.activate_virtualenv()
 
     def setup_project(self):
         '''
@@ -95,9 +98,6 @@ class Loader(object):
 
     def get_docs_dir(self):
         raise NotImplementedError('Needs to be implemented by subclass.')
-
-    def get_doctrees_dir(self):
-        return os.path.join(self.get_tmp_dir(), 'doctrees')
 
 #    def check_for_conf(self):
 #        if not os.path.exists(self.docs_path):
@@ -126,6 +126,9 @@ class Loader(object):
         return False
 
     def get_pip_requirements_file(self):
+        raise NotImplementedError('Needs to be implemented by subclass.')
+
+    def use_virtualenv(self):
         raise NotImplementedError('Needs to be implemented by subclass.')
 
     def setup_virtualenv(self):
@@ -165,6 +168,9 @@ class Loader(object):
             log.debug('Using existing virtualenv: {}'.format(
                 virtualenv_dir))
 
+    def activate_virtualenv(self):
+        raise NotImplementedError()
+
     def cleanup(self):
         '''
         Delete all cached files that are needed to build the annotated docs.
@@ -177,20 +183,39 @@ class Loader(object):
 
 
 class LocalLoader(Loader):
+    def get_default_tmp_dir(self):
+        token = hashlib.sha1(self.path).hexdigest()
+        tmp_name = self.path.lstrip('/')
+        tmp_name = tmp_name.replace('/', '_')
+        tmp_dirname = '{name}--{token}'.format(
+            name=tmp_name,
+            token=token[:8])
+        return os.path.join('/tmp/annotatedocs', 'local', tmp_dirname)
+
     def get_default_build_dir(self):
         return os.path.join(self.get_docs_dir(), '_build', 'annotatedhtml')
 
     def get_docs_dir(self):
         return self.path
 
-    def get_pip_requirements_file(self):
-        return None
+    def use_virtualenv(self):
+        return False
 
 
 class VCSLoader(Loader):
     def __init__(self, path, *args, **kwargs):
         self.repository_url = path
         super(VCSLoader, self).__init__(path, *args, **kwargs)
+
+    def get_default_tmp_dir(self):
+        token = hashlib.sha1(self.repository_url).hexdigest()
+        tmp_name = self.repository_url.lstrip('/')
+        tmp_name = tmp_name.replace('/', '_')
+        tmp_name = tmp_name.replace(':', '_')
+        tmp_dirname = '{name}--{token}'.format(
+            name=tmp_name,
+            token=token[:8])
+        return os.path.join('/tmp/annotatedocs', self.vcs_type, tmp_dirname)
 
     def get_repository_url(self):
         return self.repository_url
@@ -239,18 +264,30 @@ class VCSLoader(Loader):
             os.makedirs(parent_dir)
         self.checkout_repository()
 
+    def shall_install_python_package(self):
+        project_dir = self.get_project_dir()
+        setup_py_file = os.path.join(project_dir, 'setup.py')
+        if os.path.exists(setup_py_file):
+            return True
+        else:
+            return False
+
+    def use_virtualenv(self):
+        return self.shall_install_python_package()
+
 
 class GitLoader(VCSLoader):
-    def __init__(self, path):
-        raise NotImplementedError
+    vcs_type = 'git'
 
     def checkout_repository(self):
         sh.git.clone(self.get_repository_url(), self.get_checkout_dir())
 
 
 class SubversionLoader(VCSLoader):
-    def __init__(self, path):
-        raise NotImplementedError
+    vcs_type = 'svn'
+
+    def checkout_repository(self):
+        sh.svn.checkout(self.get_repository_url(), self.get_checkout_dir())
 
 
 class ReadTheDocsLoader(VCSLoader):
@@ -279,6 +316,9 @@ class ReadTheDocsLoader(VCSLoader):
         return project_data
 
     def shall_install_python_package(self):
+        return self.project_data['use_virtualenv']
+
+    def use_virtualenv(self):
         return self.project_data['use_virtualenv']
 
     def get_pip_requirements_file(self):

@@ -1,4 +1,3 @@
-import hashlib
 from signal import signal, SIGPIPE, SIG_DFL
 import sys
 
@@ -7,10 +6,6 @@ import click
 
 from .loader import get_project_loader
 from .project import Project
-
-
-def get_token(string):
-    return hashlib.sha1(string).hexdigest()
 
 
 @click.command()
