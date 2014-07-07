@@ -1,13 +1,11 @@
 import json
 
-from rdflib import Graph
 import sphinx_rtd_theme_annotated
 from sphinx.application import Sphinx
 from sphinx.writers.html import HTMLTranslator
 from sphinx.builders.html import StandaloneHTMLBuilder
 from sphinx.util.console import darkgreen
 
-from . import doctree2rdf
 from .data import AnnotationData
 
 
@@ -108,20 +106,6 @@ class AnnotatedHTMLBuilder(StandaloneHTMLBuilder):
         for docname, doctree in self.doctrees_by_docname.items():
             self.annotation_data.add_document(doctree, docname)
 
-        return
-
-        graph = Graph()
-        for docname, doctree in self.doctrees_by_docname.items():
-            namespace_name = self.get_namespace_name(docname)
-            parser = doctree2rdf.Doctree2RDF(doctree, namespace_name)
-            graph += parser.get_graph()
-        graph += doctree2rdf.get_ontology()
-        self.info('Apply OWL reasoning on annotation data...')
-#        reasoner.owlrl(graph)
-        with open('/tmp/annotatedocs.ttl', 'w') as f:
-            graph.serialize(f, format='turtle')
-        self.annotation_graph = graph
-
 
 class AnnotatedSphinx(Sphinx):
     def __init__(self, *args, **kwargs):
@@ -131,13 +115,3 @@ class AnnotatedSphinx(Sphinx):
         kwargs['confoverrides'] = confoverrides
         super(AnnotatedSphinx, self).__init__(*args, **kwargs)
         self.builder = AnnotatedHTMLBuilder(self)
-        self.document_graphs = {}
-
-    def get_document_graph(self, node):
-        document = node
-        while document.parent is not None:
-            document = document.parent
-        if document not in self.document_graphs:
-            graph = doctree2rdf.get_graph(document, reason=False)
-            self.document_graphs[document] = graph
-        return self.document_graphs[document]
