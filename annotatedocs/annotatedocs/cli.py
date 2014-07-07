@@ -11,11 +11,19 @@ from .project import Project
 
 @click.command()
 @click.argument('docs', type=click.Path(), default='.')
-@click.option('-b', '--build-dir', type=click.Path(), default=None, help='Set build directory in which the annotated html shall be placed.')
-@click.option('--tmp-dir', type=click.Path(), default=None, help='Set working directory in which the projects shall be downloaded.')
-@click.option('-r', '--recreate/--no-recreate', is_flag=True, help='Recreate all cached files.')
+@click.option('-b', '--build-dir', type=click.Path(), default=None,
+              help=(
+                  'Set build directory in which the annotated html shall be '
+                  'placed.'))
+@click.option('--tmp-dir', type=click.Path(), default=None,
+              help=(
+                  'Set working directory in which the projects shall be '
+                  'downloaded.'))
+@click.option('-r', '--recreate/--no-recreate', is_flag=True,
+              help='Recreate all cached files.')
 @click.option('--debug/--no-debug', is_flag=True, help='Show debug output.')
-@click.option('-w', is_flag=True, help='Open the build documentation in your default webbrowser.')
+@click.option('-w', is_flag=True,
+              help='Open the build documentation in your default webbrowser.')
 def main(docs, build_dir, tmp_dir, recreate, debug, w):
     '''
     annotatedocs analyzes your sphinx-based documentation and provides helpful

@@ -88,6 +88,8 @@ class Loader(object):
         if self.use_virtualenv():
             self.setup_virtualenv()
             self.activate_virtualenv()
+        else:
+            log.debug('Not using virtualenv for this build.')
 
     def setup_project(self):
         '''
@@ -120,7 +122,9 @@ class Loader(object):
         return os.path.join(self.get_tmp_dir(), 'venv')
 
     def get_virtualenv_command(self, executable):
-        return sh.Command(os.path.join(self.get_virtualenv_dir(), 'bin', executable))
+        return sh.Command(
+            os.path.join(
+                self.get_virtualenv_dir(), 'bin', executable))
 
     def shall_install_python_package(self):
         return False
@@ -144,9 +148,12 @@ class Loader(object):
             pip = self.get_virtualenv_command('pip')
 
             # Install Sphinx.
-            for output in pip.install('--upgrade', *self.dependencies,
-                                      _iter=True):
-                log.debug('pip install: {}'.format(output))
+            if self.dependencies:
+                for output in pip.install(
+                        '--upgrade',
+                        *self.dependencies,
+                        _iter=True):
+                    log.debug('pip install: {}'.format(output))
 
             # Install python package if needed.
             if self.shall_install_python_package():
@@ -169,7 +176,9 @@ class Loader(object):
                 virtualenv_dir))
 
     def activate_virtualenv(self):
-        raise NotImplementedError()
+        virtuelenv_dir = self.get_virtualenv_dir()
+        activate_this = os.path.join(virtuelenv_dir, 'bin', 'activate_this.py')
+        execfile(activate_this)
 
     def cleanup(self):
         '''
@@ -205,6 +214,7 @@ class LocalLoader(Loader):
 class VCSLoader(Loader):
     def __init__(self, path, *args, **kwargs):
         self.repository_url = path
+        self.revision = kwargs.pop('revision', None)
         super(VCSLoader, self).__init__(path, *args, **kwargs)
 
     def get_default_tmp_dir(self):
@@ -212,6 +222,8 @@ class VCSLoader(Loader):
         tmp_name = self.repository_url.lstrip('/')
         tmp_name = tmp_name.replace('/', '_')
         tmp_name = tmp_name.replace(':', '_')
+        if self.revision:
+            tmp_name = '{}@{}'.format(tmp_name, self.revision)
         tmp_dirname = '{name}--{token}'.format(
             name=tmp_name,
             token=token[:8])
@@ -275,19 +287,41 @@ class VCSLoader(Loader):
     def use_virtualenv(self):
         return self.shall_install_python_package()
 
+    def get_pip_requirements_file(self):
+        return None
+
 
 class GitLoader(VCSLoader):
     vcs_type = 'git'
 
     def checkout_repository(self):
-        sh.git.clone(self.get_repository_url(), self.get_checkout_dir())
+        if self.revision:
+            sh.git.clone(
+                '--single-branch',
+                self.get_repository_url(),
+                self.get_checkout_dir(),
+                branch=self.revision)
+        else:
+            sh.git.clone(
+                '--single-branch',
+                self.get_repository_url(),
+                self.get_checkout_dir())
 
 
 class SubversionLoader(VCSLoader):
     vcs_type = 'svn'
 
     def checkout_repository(self):
-        sh.svn.checkout(self.get_repository_url(), self.get_checkout_dir())
+        if self.revision:
+            sh.svn.checkout(
+                '-r',
+                self.revision,
+                self.get_repository_url(),
+                self.get_checkout_dir())
+        else:
+            sh.svn.checkout(
+                self.get_repository_url(),
+                self.get_checkout_dir())
 
 
 class ReadTheDocsLoader(VCSLoader):
@@ -329,7 +363,7 @@ class ReadTheDocsLoader(VCSLoader):
 
 
 PREFIXED_LOADERS = [
-    (r'^git\+(?P<path>.+)$', GitLoader,),
-    (r'^svn\+(?P<path>.+)$', SubversionLoader,),
+    (r'^git\+(?P<path>.+?)(?:@(?P<revision>[a-f0-9]+))?$', GitLoader,),
+    (r'^svn\+(?P<path>.+?)(?:@(?P<revision>\d+))?$', SubversionLoader,),
     (r'^rtd\+(?P<path>[-a-zA-Z0-9]+)$', ReadTheDocsLoader,),
 ]

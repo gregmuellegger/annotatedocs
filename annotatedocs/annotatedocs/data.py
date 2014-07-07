@@ -1,3 +1,9 @@
+from logbook import Logger
+
+
+log = Logger(__name__)
+
+
 class AnnotationData(object):
     def __init__(self):
         self.data = {}
@@ -39,4 +45,7 @@ class AnnotationData(object):
         self[document]['name'] = name
 
     def __getitem__(self, node):
+        if node not in self.data:
+            log.warning('Creating missing data dict for: {}'.format(node))
+            self.data[node] = {}
         return self.data[node]
