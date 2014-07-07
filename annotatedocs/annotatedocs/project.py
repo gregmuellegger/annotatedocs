@@ -41,3 +41,4 @@ class Project(object):
             log.info(
                 'Build finished. Open file://{path} in your browser to see '
                 'the annotations.'.format(path=index_file))
+            return index_file

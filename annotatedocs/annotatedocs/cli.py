@@ -1,4 +1,5 @@
 from signal import signal, SIGPIPE, SIG_DFL
+import webbrowser
 import sys
 
 from logbook import NullHandler, StreamHandler
@@ -14,7 +15,8 @@ from .project import Project
 @click.option('--tmp-dir', type=click.Path(), default=None, help='Set working directory in which the projects shall be downloaded.')
 @click.option('-r', '--recreate/--no-recreate', is_flag=True, help='Recreate all cached files.')
 @click.option('--debug/--no-debug', is_flag=True, help='Show debug output.')
-def main(docs, build_dir, tmp_dir, recreate, debug):
+@click.option('-w', is_flag=True, help='Open the build documentation in your default webbrowser.')
+def main(docs, build_dir, tmp_dir, recreate, debug, w):
     '''
     annotatedocs analyzes your sphinx-based documentation and provides helpful
     feedback about the quality and possible improvements.
@@ -51,4 +53,7 @@ def main(docs, build_dir, tmp_dir, recreate, debug):
             if recreate:
                 project.cleanup()
             project.setup()
-            project.build()
+            index_file = project.build()
+
+            if w:
+                webbrowser.open(index_file)
