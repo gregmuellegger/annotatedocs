@@ -20,28 +20,6 @@ def walk(node, func):
         walk(child, func)
 
 
-class Annotation(object):
-    level = None
-
-    def __init__(self, message, level=None):
-        self.message = message
-        self.level = level or self.level
-
-    def serialize(self):
-        return {
-            'message': self.message,
-            'level': self.level,
-        }
-
-
-class Hint(Annotation):
-    level = 'hint'
-
-
-class Warning(Annotation):
-    level = 'warning'
-
-
 class DocumentStructure(object):
     '''
     This is the document structure as given by the documentation project.
@@ -64,6 +42,7 @@ class DocumentStructure(object):
         return self.document_data[name]
 
     def get_global_annotations(self):
+        from .annotations import Warning
         return [Warning('This is a global warning')]
 
     def analyze(self):
@@ -114,15 +93,36 @@ class Document(object):
         return metrics
 
     def apply_metrics(self):
-        for metric_class in self.get_required_metrics():
-            metric = metric_class()
+        required_metrics = list(self.get_required_metrics())
+        while required_metrics:
+            current_metric_class = required_metrics.pop()
+            if current_metric_class in self.applied_metrics:
+                continue
+            metric = current_metric_class()
+
+            # Check for dependencies of this metric.
+            subrequired_metrics = metric.get_required_metrics()
+            if subrequired_metrics:
+                for subrequired_metric_class in subrequired_metrics:
+                    if subrequired_metric_class not in self.applied_metrics:
+                        # Re-add currently checked metric.
+                        required_metrics.append(current_metric_class)
+                        # And add the required one. This will get processed
+                        # next.
+                        required_metrics.append(subrequired_metric_class)
+                        continue
+
+                    # TODO check for circular dependencies.
+
+            # Finally apply metric.
             nodeset = self.nodeset.all()
             nodeset = metric.limit(nodeset)
             for node in nodeset:
                 metric.apply(
                     node=node,
                     data=self[node])
-            self.applied_metrics.add(metric_class)
+
+            self.applied_metrics.add(current_metric_class)
 
     def analyze(self):
         self.apply_metrics()

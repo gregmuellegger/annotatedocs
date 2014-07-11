@@ -2,12 +2,17 @@ import nltk
 from nltk.stem.porter import PorterStemmer
 
 from .base import Metric
+from .nodetype import NodeType
 
 
 __all__ = ('Stemmer',)
 
 
 class Stemmer(Metric):
+    required_metrics = [
+        NodeType,
+    ]
+
     stemmer_class = PorterStemmer
 
     def __init__(self, *args, **kwargs):

@@ -7,6 +7,9 @@ class Metric(object):
     def __init__(self):
         self.required_metrics = list(self.required_metrics)
 
+    def get_required_metrics(self):
+        return self.required_metrics
+
     @property
     def data(self):
         return self.document.node_data

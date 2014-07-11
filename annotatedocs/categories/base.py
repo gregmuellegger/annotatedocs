@@ -1,7 +1,7 @@
 from ..annotations import Hint, Warning
 
 
-__all__ = ('Category',)
+__all__ = ('Category', 'GenericCategory',)
 
 
 class Category(object):
@@ -20,8 +20,12 @@ class Category(object):
         return 1
 
     def make_annotations(self, document):
-        for node in document.nodeset.all():
-            if 'stemmed_words' in document[node]:
-                print "Has stemmed words:", document[node]['stemmed_words']
+        raise NotImplementedError('Subclasses need to implement this method.')
+
+
+class GenericCategory(Category):
+    def make_annotations(self, document):
+        for node in document.nodeset.filter(stemmed_words__exists=True):
+            print "Has stemmed words:", document[node]['stemmed_words']
         nodeset = document.nodeset.filter(type='paragraph')
         nodeset.annotate(Warning('This is a paragraph'))
