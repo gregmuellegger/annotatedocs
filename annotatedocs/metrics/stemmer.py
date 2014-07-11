@@ -20,7 +20,7 @@ class Stemmer(Metric):
         self.stemmer = self.stemmer_class()
 
     def limit(self, nodeset):
-        return nodeset.filter(type='paragraph')
+        return nodeset.filter(is_content_type=True)
 
     def stem(self, text):
         for sentence in nltk.sent_tokenize(text):

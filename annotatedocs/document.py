@@ -1,6 +1,6 @@
 from logbook import Logger
 from .nodeset import NodeSet
-from .categories import InstallationGuide
+from .categories import DefaultCategory, InstallationGuide
 
 
 log = Logger(__name__)
@@ -67,6 +67,12 @@ class Document(object):
         Is set to ``True`` after the analyzation is completed.
     '''
 
+    categories = [
+        InstallationGuide,
+    ]
+    minimum_category_match = 0.1
+    default_category = DefaultCategory
+
     nodeset_class = NodeSet
 
     def __init__(self, node, name=None, structure=None):
@@ -81,62 +87,51 @@ class Document(object):
         self.is_analyzed = False
         self.applied_metrics = set()
 
-        self.possible_categories = [
-            category()
-            for category in CATEGORIES]
+        self.categories = list(self.categories)
 
     def get_required_metrics(self):
         metrics = set()
-        for category in self.possible_categories:
+        for category in self.categories:
             metrics.update(
                 category.get_required_metrics())
         return metrics
 
-    def apply_metrics(self):
-        required_metrics = list(self.get_required_metrics())
-        while required_metrics:
-            current_metric_class = required_metrics.pop()
-            if current_metric_class in self.applied_metrics:
-                continue
-            metric = current_metric_class()
+    def apply_metric(self, metric_class):
+        if metric_class in self.applied_metrics:
+            return
 
-            # Check for dependencies of this metric.
-            subrequired_metrics = metric.get_required_metrics()
-            if subrequired_metrics:
-                for subrequired_metric_class in subrequired_metrics:
-                    if subrequired_metric_class not in self.applied_metrics:
-                        # Re-add currently checked metric.
-                        required_metrics.append(current_metric_class)
-                        # And add the required one. This will get processed
-                        # next.
-                        required_metrics.append(subrequired_metric_class)
-                        continue
+        # Finally apply metric.
+        metric = metric_class()
+        nodeset = self.nodeset.all()
+        nodeset = metric.limit(nodeset)
+        for node in nodeset:
+            metric.apply(
+                node=node,
+                data=self[node])
 
-                    # TODO check for circular dependencies.
+        self.applied_metrics.add(metric_class)
 
-            # Finally apply metric.
-            nodeset = self.nodeset.all()
-            nodeset = metric.limit(nodeset)
-            for node in nodeset:
-                metric.apply(
-                    node=node,
-                    data=self[node])
-
-            self.applied_metrics.add(current_metric_class)
+    def apply_metrics(self, metric_classes):
+        for metric_class in metric_classes:
+            self.apply_metric(metric_class)
 
     def analyze(self):
-        self.apply_metrics()
+        self.apply_metrics(self.get_required_metrics())
         self.category = self.determine_category()
-        self.category.make_annotations(self)
+        self.category.apply_annotations(self)
         self.is_analyzed = True
 
     def determine_category(self):
         matched_categories = []
-        for category in self.possible_categories:
+        for category_class in self.categories:
+            category = category_class()
             match = category.match(document=self)
             matched_categories.append((match, category))
         matched_categories = sorted(matched_categories, key=lambda mc: mc[0])
-        return matched_categories[0][1]
+        match, best_category = matched_categories[0]
+        if match < self.minimum_category_match:
+            return self.default_category()
+        return best_category
 
     def get_annotations(self, node):
         return self.data.get(node, 'annotations', [])

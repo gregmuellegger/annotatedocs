@@ -73,7 +73,12 @@ class NodeSet(object):
         self._filters = []
 
     def __repr__(self):
-        items = ', '.join(unicode(node) for node in list(self))
+        nodes = list(self[:11])
+        items = ', '.join(
+            unicode(node.__class__.__name__)
+            for node in nodes[:10])
+        if len(nodes) > 10:
+            items += ', ...'
         return '<{class_name}: len={count} [{items}]>'.format(
             class_name=self.__class__.__name__,
             count=self.count(),
@@ -84,11 +89,20 @@ class NodeSet(object):
         cloned._filters = self._filters[:]
         return cloned
 
+    def __getitem__(self, i):
+        # TODO: optimize this.
+        return list(self)[i]
+
     def all(self):
         return self._clone()
 
     def count(self):
         return len(self)
+
+    def exists(self):
+        # TODO: Optimize for performance and return True after the first
+        # matching node was found.
+        return self.count() >= 1
 
     def __len__(self):
         return list(self.__iter__()).__len__()

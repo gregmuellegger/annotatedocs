@@ -1,17 +1,35 @@
-from .base import GenericCategory
-from ..metrics import NodeType, Stemmer
+from __future__ import division
+
+from .base import BasicCategory
+from ..metrics import Stemmer
 
 
 __all__ = ('InstallationGuide',)
 
 
-class InstallationGuide(GenericCategory):
-    required_metrics = [
-        NodeType,
+class InstallationGuide(BasicCategory):
+    name = 'installation guide'
+
+    required_metrics = BasicCategory.required_metrics + [
         Stemmer,
     ]
 
+    required_words = [
+        'Installation',
+        'pip',
+        'apt-get',
+    ]
+
     def match(self, document):
-        nodeset = document.nodeset.filter(stemmed_words__contains='install')
-        print nodeset
-        return 1
+        stemmer = Stemmer()
+        words = set(stemmer.stem(' '.join(self.required_words)))
+        found_words = set()
+
+        nodeset = document.nodeset.all()
+        for word in words:
+            if nodeset.filter(stemmed_words__contains=word).exists():
+                found_words.add(word)
+
+        found_words_ratio = len(found_words) / len(words)
+
+        return found_words_ratio
