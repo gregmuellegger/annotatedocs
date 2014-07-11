@@ -31,8 +31,8 @@ setup(
         'scripts/annotatedocs',
     ],
     install_requires=[
-        'click>=2.0'
-        'logbook',
+        'click>=2.0',
+        'Logbook',
         'nltk',
         'sh',
         'slumber',
