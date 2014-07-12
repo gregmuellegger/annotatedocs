@@ -6,7 +6,7 @@ from sphinx.writers.html import HTMLTranslator
 from sphinx.builders.html import StandaloneHTMLBuilder
 from sphinx.util.console import darkgreen
 
-from .document import DocumentStructure
+from .document import DocumentStructure, default_bundle
 
 
 class AnnotatedHTMLTranslator(HTMLTranslator):
@@ -99,7 +99,7 @@ class AnnotatedHTMLBuilder(StandaloneHTMLBuilder):
             (doctree, docname)
             for docname, doctree in doctrees_by_docname.items())
 
-        self.document_structure = DocumentStructure(self.doctrees_by_docname)
+        self.document_structure = DocumentStructure(self.doctrees_by_docname, bundle=default_bundle)
         # Kick off the analyzing step. This includes finding the category and
         # adding the annotations to the relevant nodes.
         self.document_structure.analyze()

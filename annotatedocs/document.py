@@ -1,5 +1,6 @@
 from logbook import Logger
 from .nodeset import NodeSet
+from .bundle import Bundle
 from .categories import DefaultCategory, InstallationGuide
 
 
@@ -9,15 +10,16 @@ log = Logger(__name__)
 NO_DEFAULT = object()
 
 
-CATEGORIES = [
-    InstallationGuide,
-]
-
-
 def walk(node, func):
     func(node)
     for child in node.children:
         walk(child, func)
+
+
+default_bundle = Bundle(
+    InstallationGuide,
+    default_category=DefaultCategory,
+)
 
 
 class DocumentStructure(object):
@@ -32,7 +34,8 @@ class DocumentStructure(object):
     annotations to other documents.
     '''
 
-    def __init__(self, documents=None):
+    def __init__(self, documents, bundle):
+        self.bundle = bundle
         self.global_annotations = []
         self.document_data = {}
         if documents:
@@ -40,7 +43,8 @@ class DocumentStructure(object):
                 self.add_document(name, document)
 
     def add_document(self, name, node):
-        self.document_data[name] = Document(node, name, structure=self)
+        self.document_data[name] = Document(node, self.bundle, name,
+                                            structure=self)
 
     def get_document(self, name):
         return self.document_data[name]
@@ -71,16 +75,11 @@ class Document(object):
         Is set to ``True`` after the analyzation is completed.
     '''
 
-    categories = [
-        InstallationGuide,
-    ]
-    minimum_category_match = 0.1
-    default_category = DefaultCategory
-
     nodeset_class = NodeSet
 
-    def __init__(self, node, name=None, structure=None):
+    def __init__(self, node, bundle, name=None, structure=None):
         self.node = node
+        self.bundle = bundle
         self.name = name
         self.structure = structure
 
@@ -91,8 +90,6 @@ class Document(object):
         self.is_analyzed = False
         self.applied_metrics = set()
 
-        self.categories = list(self.categories)
-
     @property
     def nodeset(self):
         return self.nodeset_class(self)
@@ -102,7 +99,7 @@ class Document(object):
 
     def get_required_metrics(self):
         metrics = set()
-        for category in self.categories:
+        for category in self.bundle.get_categories():
             metrics.update(
                 category.get_required_metrics())
         return metrics
@@ -125,15 +122,35 @@ class Document(object):
             self.apply_metric(metric_class)
 
     def determine_category(self):
+        # TODO: Check if this method is better suited in the Bundle class.
         matched_categories = []
-        for category_class in self.categories:
+        for category_class in self.bundle.get_categories():
             category = category_class()
             match = category.match(document=self)
             matched_categories.append((match, category))
         matched_categories = sorted(matched_categories, key=lambda mc: mc[0])
+
+        # TODO: check if there are multiple categories with the same match
+        # value.
         match, best_category = matched_categories[0]
-        if match < self.minimum_category_match:
-            return self.default_category()
+
+        # We have no matched category. So we return the default category.
+        if match < self.bundle.minimum_category_match:
+            default_category_class = self.bundle.get_default_category()
+            if default_category_class is None:
+                raise TypeError(
+                    u'The given bundle does not provide a default category.')
+
+            default_category = default_category_class()
+
+            # We have not applied the default categories' metrics so far. So
+            # let's do that. We want to be equal to all categories, don't we?
+            self.apply_metrics(default_category.get_required_metrics())
+
+            # And therefore we also need to call the match method.
+            default_category.match(document=self)
+
+            return default_category
         return best_category
 
     def analyze(self):
