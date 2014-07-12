@@ -33,11 +33,11 @@ class AnnotatedHTMLTranslator(HTMLTranslator):
             node.parent is node.document and
             node.parent.index(node) == 0)
 
-    def apply_annotation_attribute(self, attributes, attribute, annotations):
-        if annotations:
+    def apply_annotation_attribute(self, attributes, attribute, messages):
+        if messages:
             json_data =  json.dumps([
-                annotation.serialize()
-                for annotation in annotations])
+                message.serialize()
+                for message in messages])
             attributes[attribute] = json_data
 
     def apply_annotations(self, node):
@@ -52,12 +52,12 @@ class AnnotatedHTMLTranslator(HTMLTranslator):
             self.apply_annotation_attribute(
                 attributes,
                 'data-document-annotations',
-                self.document_data.get_annotations(node.document))
+                self.document_data[node.document].messages)
 
         self.apply_annotation_attribute(
             attributes,
             'data-annotations',
-            self.document_data.get_annotations(node))
+            self.document_data[node].messages)
 
         return attributes
 

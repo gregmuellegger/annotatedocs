@@ -16,6 +16,15 @@ class Category(MetricRequirementMixin, object):
         raise NotImplementedError('Needs to be implemented by subclass.')
 
     def get_annotations(self):
+        '''
+        This returns the annotations that should be checked and applied to the
+        document which matches this category.
+
+        You can customize the behaviour based on the input gather during the
+        ``match()`` call. This is usefull to apply different annotations
+        depending on how good the category matched or if it contained this or
+        that metric.
+        '''
         return list(self.annotations)
 
     def apply_annotations(self, document):
@@ -44,7 +53,9 @@ class BasicCategory(Category):
 
 class DefaultCategory(BasicCategory):
     '''
-    This category will be applied when no other category reaches a minimum match value.
+    This is the default default-category. It will be applied to a document when
+    no other category reaches a minimum match threshold. The default category
+    can be customized on a per project basis.
     '''
 
     name = 'no category found'

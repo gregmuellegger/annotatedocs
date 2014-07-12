@@ -25,7 +25,11 @@ class DocumentStructure(object):
     This is the document structure as given by the documentation project.
 
     It holds the ``document_data`` attribute which is dictionary with the name
-    of documents as key and a ``NodeData`` instance as value.
+    of documents as key and a ``Document`` instance as value.
+
+    The ``Document`` instances will usually hold a reference to the structure.
+    This allows traversing the whole document structure in order to related
+    annotations to other documents.
     '''
 
     def __init__(self, documents=None):
@@ -105,9 +109,7 @@ class Document(object):
         nodeset = self.nodeset.all()
         nodeset = metric.limit(nodeset)
         for node in nodeset:
-            metric.apply(
-                node=node,
-                data=self[node])
+            metric.apply(node)
 
         self.applied_metrics.add(metric_class)
 
@@ -133,12 +135,6 @@ class Document(object):
             return self.default_category()
         return best_category
 
-    def get_annotations(self, node):
-        return self.data.get(node, 'annotations', [])
-
-    def add_annotation(self, node, annotation):
-        self.data.add_annotation(node, annotation)
-
     @property
     def nodeset(self):
         return self.nodeset_class(self)
@@ -148,11 +144,19 @@ class Document(object):
 
 
 class DataItem(dict):
-    def __init__(self, node_data):
+    def __init__(self, node, node_data):
+        self.node = node
         self.node_data = node_data
 
     def append(self, key, value):
         self.setdefault(key, []).append(value)
+
+    def annotate(self, message):
+        self.append('messages', message)
+
+    @property
+    def messages(self):
+        return self.get('messages', [])
 
 
 class NodeData(object):
@@ -174,7 +178,7 @@ class NodeData(object):
         self._data = {}
 
         def init_node(node):
-            self._data[node] = self.data_item_class(self)
+            self._data[node] = self.data_item_class(node, node_data=self)
 
         walk(self.root_node, init_node)
 
@@ -196,7 +200,3 @@ class NodeData(object):
                 key=key,
                 node=node))
         return data[key]
-
-    def add_annotation(self, node, annotation):
-        data = self._data[node]
-        data.setdefault('annotations', []).append(annotation)

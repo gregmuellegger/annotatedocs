@@ -33,28 +33,53 @@ class NodeSet(object):
 
     An example::
 
-        >>> nodeset = NodeSet(node)
+        >>> nodeset = NodeSet(document)
         >>> all_paragraphs = nodeset.filter(type='paragraph')
         >>> print all_paragraphs
         [<paragraph: ...>, <paragraph: ...>]
 
-    It is inspired by django's querysets.
+    The lookups applied to the ``filter`` method apply to the node's data
+    items. These are the objects that store the data that is added by the
+    metric classes during analyzation.
+
+    You can iterate over the nodeset to get the actual data out as single
+    objects. Note that the nodeset will return
+    ``annotatedocs.document.DataItem`` instances. To get to the actual
+    docutil's ``Node`` instance, you have to access the data items ``node``
+    attribute, like this::
+
+        >>> import docutils.nodes
+        >>> nodeset = NodeSet(document)
+        >>> dateitem = nodeset[0]
+        >>> type(dataitem)
+        <class 'annotatedocs.document.DataItem'>
+        >>> isinstance(dataitem, docutils.nodes.Node)
+        False
+        >>> isinstance(dataitem.node, docutils.nodes.Node)
+        True
+
+    The API is heavily inspired by django's querysets.
     '''
 
     default_lookup_type = 'exact'
 
     # Methods given in lookup_types have a special signature.
     # They take three arguments:
+    #
     #   ``document``
+    #       The document which was given to the ``NodeSet``'s ``__init__``
+    #       method.
     #
-    #   ``key``: The name of the keyword argument before the two underscores.
-    #       So for ``.filter(foo__contains='bar')``, the key would be 'foo'.
+    #   ``key``
+    #       The name of the keyword argument before the two underscores. So for
+    #       ``.filter(foo__contains='bar')``, the key would be ``'foo'``.
     #
-    #   ``test_value``: The given value of the keyword argument. In the example
-    #       above it would be ``'bar'``.
+    #   ``test_value``
+    #       The given value of the keyword argument. In the example above it
+    #       would be ``'bar'``.
     #
-    # They shall then return based on those arguments return a callable that
-    # takes a node and returns if the node meets a lookup specific criteria.
+    # They shall then based on those arguments return a callable that takes a
+    # node and returns if the node meets a lookup specific criteria.
 
     lookup_types = {
         'exact': lookup(lambda a, b: a == b),
@@ -158,12 +183,12 @@ class NodeSet(object):
         if not hasattr(self, '_result_cache'):
             self._result_cache = list(self._evaluate(self.node))
         for node in self._result_cache:
-            yield node
+            yield self.document[node]
 
-    def annotate(self, annotation):
+    def annotate(self, message):
         '''
         Add a annotation to all selected nodes.
         '''
         for node in self:
-            self.document.add_annotation(node, annotation)
+            self.document[node].annotate(message)
         return self

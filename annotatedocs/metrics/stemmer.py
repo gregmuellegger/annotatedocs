@@ -28,8 +28,8 @@ class Stemmer(Metric):
                 stemmed_word = self.stemmer.stem(token)
                 yield stemmed_word.lower()
 
-    def apply(self, node, data):
-        stemmed_words = data.setdefault('stemmed_words', set())
-        text = node.astext()
+    def apply(self, node):
+        stemmed_words = node.setdefault('stemmed_words', set())
+        text = node.node.astext()
         for word in self.stem(text):
             stemmed_words.add(word)

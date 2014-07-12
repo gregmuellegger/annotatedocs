@@ -21,8 +21,8 @@ class WordStats(Metric):
     def limit(self, nodeset):
         return nodeset.filter(is_content_type=True)
 
-    def apply(self, node, data):
-        text = node.astext()
+    def apply(self, node):
+        text = node.node.astext()
         sentences = [
             nltk.word_tokenize(sentence)
             for sentence in nltk.sent_tokenize(text)]
@@ -30,6 +30,6 @@ class WordStats(Metric):
         word_count = sum([len(sentence) for sentence in sentences])
         sentence_count = len(sentences)
 
-        data['word_count'] = word_count
-        data['sentence_count'] = sentence_count
-        data['avg_sentence_length'] = word_count / sentence_count
+        node['word_count'] = word_count
+        node['sentence_count'] = sentence_count
+        node['avg_sentence_length'] = word_count / sentence_count
