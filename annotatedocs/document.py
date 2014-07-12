@@ -84,7 +84,7 @@ class Document(object):
         self.name = name
         self.structure = structure
 
-        self.data = NodeData(self.node, document=self)
+        self.data = DocumentData(self.node, document=self)
 
         # Data that is set during analyzing phase.
         self.category = None
@@ -92,6 +92,13 @@ class Document(object):
         self.applied_metrics = set()
 
         self.categories = list(self.categories)
+
+    @property
+    def nodeset(self):
+        return self.nodeset_class(self)
+
+    def __getitem__(self, node):
+        return self.data[node]
 
     def get_required_metrics(self):
         metrics = set()
@@ -117,12 +124,6 @@ class Document(object):
         for metric_class in metric_classes:
             self.apply_metric(metric_class)
 
-    def analyze(self):
-        self.apply_metrics(self.get_required_metrics())
-        self.category = self.determine_category()
-        self.category.apply_annotations(self)
-        self.is_analyzed = True
-
     def determine_category(self):
         matched_categories = []
         for category_class in self.categories:
@@ -135,18 +136,17 @@ class Document(object):
             return self.default_category()
         return best_category
 
-    @property
-    def nodeset(self):
-        return self.nodeset_class(self)
+    def analyze(self):
+        self.apply_metrics(self.get_required_metrics())
+        self.category = self.determine_category()
+        self.category.apply_annotations(self)
+        self.is_analyzed = True
 
-    def __getitem__(self, node):
-        return self.data[node]
 
-
-class DataItem(dict):
-    def __init__(self, node, node_data):
+class NodeData(dict):
+    def __init__(self, node, document_data):
         self.node = node
-        self.node_data = node_data
+        self.document_data = document_data
 
     def append(self, key, value):
         self.setdefault(key, []).append(value)
@@ -159,15 +159,15 @@ class DataItem(dict):
         return self.get('messages', [])
 
 
-class NodeData(object):
+class DocumentData(object):
     '''
-    A ``NodeData`` holds the relevant data for the node and it's subtree.
+    A ``DocumentData`` holds the relevant data for the node and it's subtree.
 
     The data contains the calculated metrics as well as the generated
     annotations.
     '''
 
-    data_item_class = DataItem
+    node_data_class = NodeData
 
     def __init__(self, node, document=None):
         self.document = document
@@ -178,7 +178,7 @@ class NodeData(object):
         self._data = {}
 
         def init_node(node):
-            self._data[node] = self.data_item_class(node, node_data=self)
+            self._data[node] = self.node_data_class(node, document_data=self)
 
         walk(self.root_node, init_node)
 

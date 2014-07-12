@@ -44,15 +44,15 @@ class NodeSet(object):
 
     You can iterate over the nodeset to get the actual data out as single
     objects. Note that the nodeset will return
-    ``annotatedocs.document.DataItem`` instances. To get to the actual
-    docutil's ``Node`` instance, you have to access the data items ``node``
+    ``annotatedocs.document.NodeData`` instances. To get to the actual
+    docutil's ``Node`` instance, you have to access the node data's ``node``
     attribute, like this::
 
         >>> import docutils.nodes
         >>> nodeset = NodeSet(document)
         >>> dateitem = nodeset[0]
         >>> type(dataitem)
-        <class 'annotatedocs.document.DataItem'>
+        <class 'annotatedocs.document.NodeData'>
         >>> isinstance(dataitem, docutils.nodes.Node)
         False
         >>> isinstance(dataitem.node, docutils.nodes.Node)
