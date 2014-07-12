@@ -35,7 +35,7 @@ class AnnotatedHTMLTranslator(HTMLTranslator):
 
     def apply_annotation_attribute(self, attributes, attribute, messages):
         if messages:
-            json_data =  json.dumps([
+            json_data = json.dumps([
                 message.serialize()
                 for message in messages])
             attributes[attribute] = json_data

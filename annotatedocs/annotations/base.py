@@ -5,6 +5,14 @@ __all__ = ('Annotation',)
 
 
 class Annotation(MetricRequirementMixin, object):
+    '''
+    Annotations are quite simple classes but fulfill a core part of the
+    ``annotatedocs`` framework.
+
+    An annotation is responsible for actually adding the messages to the
+    relevant nodes.
+    '''
+
     message = None
 
     def limit(self, nodeset):

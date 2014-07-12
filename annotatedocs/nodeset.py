@@ -91,9 +91,9 @@ class NodeSet(object):
         'exists': exists_lookup,
     }
 
-    def __init__(self, document):
+    def __init__(self, document, node=None):
         self.document = document
-        self.node = self.document.node
+        self.node = node or self.document.node
 
         self._filters = []
 
