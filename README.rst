@@ -18,7 +18,7 @@ Usage
 
 First install it with ``pip``::
 
-    $ pip install annotatedocs
+    pip install "https://github.com/gregmuellegger/annotatedocs/archive/master.zip#egg=annotatedocs"
 
 Then call the ``annotatedocs`` command with the path to your documentation
 directory::
