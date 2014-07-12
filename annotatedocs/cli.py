@@ -5,8 +5,7 @@ import sys
 from logbook import NullHandler, StreamHandler
 import click
 
-from .loader import get_project_loader
-from .project import Project
+from .loader import get_loader
 
 
 @click.command()
@@ -52,16 +51,14 @@ def main(docs, build_dir, tmp_dir, recreate, debug, w):
     with null_handler.applicationbound():
         with log_handler.applicationbound():
 
-            loader = get_project_loader(docs,
+            loader = get_loader(docs,
                                         build_dir=build_dir,
                                         tmp_dir=tmp_dir)
 
-            project = Project(loader)
-
             if recreate:
-                project.cleanup()
-            project.setup()
-            index_file = project.build()
+                loader.cleanup()
+            loader.setup()
+            index_file = loader.build()
 
             if w:
                 webbrowser.open(index_file)

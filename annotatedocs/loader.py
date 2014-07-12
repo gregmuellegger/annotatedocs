@@ -8,13 +8,14 @@ import sh
 import shutil
 import slumber
 
-from .utils import cd
+from .builder import AnnotatedSphinx
+from .utils import cd, tempdir
 
 
 log = Logger(__name__)
 
 
-def get_project_loader(path, **kwargs):
+def get_loader(path, **kwargs):
     for regex, loader_class in PREFIXED_LOADERS:
         match = re.match(regex, path)
         if match:
@@ -189,6 +190,23 @@ class Loader(object):
         if os.path.exists(tmp_dir):
             log.info('Cleaning up (i.e. deleting) {}'.format(tmp_dir))
             shutil.rmtree(tmp_dir)
+
+    def build(self):
+        with tempdir() as doctrees_dir:
+            app = AnnotatedSphinx(
+                srcdir=unicode(self.get_docs_dir()),
+                confdir=unicode(self.get_docs_dir()),
+                outdir=unicode(self.get_build_dir()),
+                doctreedir=unicode(doctrees_dir),
+                buildername='html')
+            app.build(force_all=True)
+            index_file = os.path.join(
+                self.get_build_dir(),
+                'index.html')
+            log.info(
+                'Build finished. Open file://{path} in your browser to see '
+                'the annotations.'.format(path=index_file))
+            return index_file
 
 
 class LocalLoader(Loader):
