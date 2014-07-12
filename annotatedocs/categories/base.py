@@ -6,14 +6,19 @@ __all__ = ('Category', 'BasicCategory', 'DefaultCategory',)
 
 
 class Category(MetricRequirementMixin, object):
+    '''
+    For every document in the documentation will be a category determined that
+    matches the kind of document. The category then holds the annotations that
+    shall be checked against the document.
+
+    That way you can have different annotations which only will only applied
+    for the documents that they are relevant for.
+
+    Categories can be grouped into bundles.
+    TODO: implement bundles.
+    '''
     name = None
     annotations = []
-
-    def match(self, document):
-        '''
-        Returns a value between 0 and 1 on how good this category matches.
-        '''
-        raise NotImplementedError('Needs to be implemented by subclass.')
 
     def get_annotations(self):
         '''
@@ -27,10 +32,20 @@ class Category(MetricRequirementMixin, object):
         '''
         return list(self.annotations)
 
+    def match(self, document):
+        '''
+        Returns a value between 0 and 1 on how good this category matches.
+        '''
+        raise NotImplementedError('Needs to be implemented by subclass.')
+
     def apply_annotations(self, document):
-        for annotation_class in self.get_annotations():
-            document.apply_metrics(annotation_class.get_required_metrics())
-            annotation = annotation_class()
+        for annotation in self.get_annotations():
+            # We accept annotation classes and instances. We instantiate those
+            # that were provided as classes.
+            if isinstance(annotation, type):
+                annotation = annotation()
+
+            document.apply_metrics(annotation.get_required_metrics())
 
             nodeset = document.nodeset.all()
             nodeset = annotation.limit(nodeset)

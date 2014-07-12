@@ -2,6 +2,31 @@ __all__ = ('MetricRequirementMixin', 'Metric')
 
 
 class MetricRequirementMixin(object):
+    '''
+    This mixin can be used for all classes that can require some metrics.
+    Just drop it into the inheritance list and set the ``required_metrics``
+    class attribute.
+
+    Make sure to include the parents ``required_metrics`` attribute as well if
+    you don't want to overwrite it::
+
+        class MyCategory(BasicCategory):
+            required_metrics = BasicCategory.required_metrics + [
+                SpecialMetric,
+                ComplexMetric,
+            ]
+
+    Unfortunatelly the ``required_metrics`` attribute can be altered in the
+    instance of classes. Actually it can be altered, but won't have any effect.
+    The reason is that the ``get_required_metrics`` method is implemented as a
+    classmethod which only has access to the **class** attributes, not to the
+    ones of the instance.
+
+    It is required for implementation reasons, since we need to be able to call
+    this method on all other metrics defined in ``required_metrics`` to get a
+    list of all dependencies.
+    '''
+
     required_metrics = []
 
     @classmethod
