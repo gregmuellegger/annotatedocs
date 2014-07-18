@@ -10,8 +10,8 @@ class MetricRequirementMixin(object):
     Make sure to include the parents ``required_metrics`` attribute as well if
     you don't want to overwrite it::
 
-        class MyCategory(BasicCategory):
-            required_metrics = BasicCategory.required_metrics + [
+        class MyPageType(BasicPage):
+            required_metrics = BasicPage.required_metrics + [
                 SpecialMetric,
                 ComplexMetric,
             ]

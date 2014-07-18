@@ -100,7 +100,7 @@ class AnnotatedHTMLBuilder(StandaloneHTMLBuilder):
             for docname, doctree in doctrees_by_docname.items())
 
         self.document_structure = DocumentStructure(self.doctrees_by_docname, bundle=default_bundle)
-        # Kick off the analyzing step. This includes finding the category and
+        # Kick off the analyzing step. This includes finding the page types and
         # adding the annotations to the relevant nodes.
         self.document_structure.analyze()
 

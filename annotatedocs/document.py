@@ -1,7 +1,7 @@
 from logbook import Logger
 from .nodeset import NodeSet
 from .bundle import Bundle
-from .categories import DefaultCategory, InstallationGuide
+from .page_types import DefaultPage, InstallationGuide
 
 
 log = Logger(__name__)
@@ -18,7 +18,7 @@ def walk(node, func):
 
 default_bundle = Bundle(
     InstallationGuide,
-    default_category=DefaultCategory,
+    default_page_type=DefaultPage,
 )
 
 
@@ -86,7 +86,7 @@ class Document(object):
         self.data = DocumentData(self.node, document=self)
 
         # Data that is set during analyzing phase.
-        self.category = None
+        self.page_type = None
         self.is_analyzed = False
         self.applied_metrics = set()
 
@@ -99,9 +99,9 @@ class Document(object):
 
     def get_required_metrics(self):
         metrics = set()
-        for category in self.bundle.get_categories():
+        for page_type in self.bundle.get_page_types():
             metrics.update(
-                category.get_required_metrics())
+                page_type.get_required_metrics())
         return metrics
 
     def apply_metric(self, metric_class):
@@ -121,42 +121,42 @@ class Document(object):
         for metric_class in metric_classes:
             self.apply_metric(metric_class)
 
-    def determine_category(self):
+    def determine_page_type(self):
         # TODO: Check if this method is better suited in the Bundle class.
-        matched_categories = []
-        for category_class in self.bundle.get_categories():
-            category = category_class()
-            match = category.match(document=self)
-            matched_categories.append((match, category))
-        matched_categories = sorted(matched_categories, key=lambda mc: mc[0])
+        matched_page_types = []
+        for page_type_class in self.bundle.get_page_types():
+            page_type = page_type_class()
+            match = page_type.match(document=self)
+            matched_page_types.append((match, page_type))
+        matched_page_types = sorted(matched_page_types, key=lambda mc: mc[0])
 
-        # TODO: check if there are multiple categories with the same match
+        # TODO: check if there are multiple page types with the same match
         # value.
-        match, best_category = matched_categories[0]
+        match, best_page_type = matched_page_types[0]
 
-        # We have no matched category. So we return the default category.
-        if match < self.bundle.minimum_category_match:
-            default_category_class = self.bundle.get_default_category()
-            if default_category_class is None:
+        # We have no matched page type. So we return the default page type.
+        if match < self.bundle.minimum_page_type_match:
+            default_page_type_class = self.bundle.get_default_page_type()
+            if default_page_type_class is None:
                 raise TypeError(
-                    u'The given bundle does not provide a default category.')
+                    u'The given bundle does not provide a default page type..')
 
-            default_category = default_category_class()
+            default_page_type = default_page_type_class()
 
-            # We have not applied the default categories' metrics so far. So
-            # let's do that. We want to be equal to all categories, don't we?
-            self.apply_metrics(default_category.get_required_metrics())
+            # We have not applied the default page types' metrics so far. So
+            # let's do that. We want to be equal to all page types, don't we?
+            self.apply_metrics(default_page_type.get_required_metrics())
 
             # And therefore we also need to call the match method.
-            default_category.match(document=self)
+            default_page_type.match(document=self)
 
-            return default_category
-        return best_category
+            return default_page_type
+        return best_page_type
 
     def analyze(self):
         self.apply_metrics(self.get_required_metrics())
-        self.category = self.determine_category()
-        self.category.apply_annotations(self)
+        self.page_type = self.determine_page_type()
+        self.page_type.apply_annotations(self)
         self.is_analyzed = True
 
 

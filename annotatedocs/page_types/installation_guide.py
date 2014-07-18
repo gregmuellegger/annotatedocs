@@ -1,16 +1,16 @@
 from __future__ import division
 
-from .base import BasicCategory
+from .base import BasicPage
 from ..metrics import Stemmer
 
 
 __all__ = ('InstallationGuide',)
 
 
-class InstallationGuide(BasicCategory):
+class InstallationGuide(BasicPage):
     name = 'installation guide'
 
-    required_metrics = BasicCategory.required_metrics + [
+    required_metrics = BasicPage.required_metrics + [
         Stemmer,
     ]
 
