@@ -13,6 +13,7 @@ Contents:
 
    installation
    text
+   basicpage/longparagraphs
 
 
 Indices and tables
