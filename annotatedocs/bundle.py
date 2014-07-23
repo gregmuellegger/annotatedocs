@@ -72,7 +72,7 @@ class Bundle(object):
     def is_sufficient_match(self, page_type, match):
         '''
         A page type will return a match between 0 and 1. That's what the API
-        defines. This is the method to check if the match is ok enought so that
+        defines. This is the method to check if the match is ok enough so that
         we allow the analyzation of the document with the given page type.
 
         The default implementation states that every match which is not 0 is
@@ -82,7 +82,9 @@ class Bundle(object):
 
     def determine_page_types(self, document):
         '''
-        This is a good place to customize if you have defined your own bundle.
+        This is a good place to customize if you have defined your own bundle
+        and want to get crazy about how the categories are matched to the
+        documents.
         '''
 
         matched_page_types = []
