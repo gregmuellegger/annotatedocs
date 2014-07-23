@@ -1,8 +1,7 @@
-from ..annotations import LongParagraph
-from ..metrics import MetricRequirementMixin, NodeType
+from ..metrics import MetricRequirementMixin
 
 
-__all__ = ('PageType', 'BasicPage', 'DefaultPage',)
+__all__ = ('PageType',)
 
 
 class PageType(MetricRequirementMixin, object):
@@ -50,30 +49,3 @@ class PageType(MetricRequirementMixin, object):
             nodeset = document.nodeset.all()
             nodeset = annotation.limit(nodeset)
             annotation.apply(nodeset, document)
-
-
-class BasicPage(PageType):
-    '''
-    This is a page type that serves as a summary of common things that nearly
-    all page types will need.
-    '''
-
-    annotations = [
-        LongParagraph,
-    ]
-    required_metrics = PageType.required_metrics + [
-        NodeType,
-    ]
-
-
-class DefaultPage(BasicPage):
-    '''
-    This is the default default-page-type. It will be applied to a document when
-    no other page type reaches a minimum match threshold. The default page type
-    can be customized on a per project basis.
-    '''
-
-    name = 'no page type found'
-
-    def match(self, document):
-        return 0

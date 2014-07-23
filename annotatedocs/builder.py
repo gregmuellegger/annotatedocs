@@ -6,7 +6,7 @@ from sphinx.writers.html import HTMLTranslator
 from sphinx.builders.html import StandaloneHTMLBuilder
 from sphinx.util.console import darkgreen
 
-from .document import DocumentStructure, default_bundle
+from .document import DocumentStructure
 
 
 class AnnotatedHTMLTranslator(HTMLTranslator):
@@ -70,6 +70,7 @@ class AnnotatedHTMLTranslator(HTMLTranslator):
 
 class AnnotatedHTMLBuilder(StandaloneHTMLBuilder):
     allow_parallel = False
+    default_bundle = 'annotatedocs.bundles.default_bundle'
 
     def init_translator_class(self):
         self.translator_class = AnnotatedHTMLTranslator
@@ -93,19 +94,39 @@ class AnnotatedHTMLBuilder(StandaloneHTMLBuilder):
         for warning in warnings:
             self.warn(*warning)
 
+    def get_configured_bundle(self):
+        return getattr(self.app.config, 'annotatedocs_bundle',
+                       self.default_bundle)
+
+    def get_bundle(self):
+        bundle_conf = self.get_configured_bundle()
+        if isinstance(bundle_conf, basestring):
+            path_bits = bundle_conf.split('.')
+            bundle_name = path_bits.pop(-1)
+            module_name = '.'.join(path_bits)
+            bundle_module = __import__(module_name, globals(), locals(),
+                                       [bundle_name], -1)
+            bundle = getattr(bundle_module, bundle_name)
+        else:
+            bundle = bundle_conf
+        return bundle
+
     def prepare_annotation_data(self, doctrees_by_docname):
         self.doctrees_by_docname = doctrees_by_docname
         self.docnames_by_doctree = dict(
             (doctree, docname)
             for docname, doctree in doctrees_by_docname.items())
 
-        self.document_structure = DocumentStructure(self.doctrees_by_docname, bundle=default_bundle)
+        self.document_structure = DocumentStructure(self.doctrees_by_docname,
+                                                    bundle=self.get_bundle())
         # Kick off the analyzing step. This includes finding the page types and
         # adding the annotations to the relevant nodes.
         self.document_structure.analyze()
 
 
 class AnnotatedSphinx(Sphinx):
+    default_bundle = 'annotatdocs.bundles.default_bundle'
+
     def __init__(self, *args, **kwargs):
         confoverrides = kwargs.pop('confoverrides', {})
         confoverrides['html_theme'] = 'sphinx_rtd_theme_annotated'

@@ -1,7 +1,5 @@
 from logbook import Logger
 from .nodeset import NodeSet
-from .bundle import Bundle
-from .page_types import DefaultPage, InstallationGuide
 
 
 log = Logger(__name__)
@@ -14,12 +12,6 @@ def walk(node, func):
     func(node)
     for child in node.children:
         walk(child, func)
-
-
-default_bundle = Bundle(
-    InstallationGuide,
-    default_page_types=[DefaultPage],
-)
 
 
 class DocumentStructure(object):
@@ -93,6 +85,14 @@ class Document(object):
         self.page_types = None
         self.is_analyzed = False
         self.applied_metrics = set()
+
+    def __repr__(self):
+        return '<{class_name}: {name}>'.format(
+            class_name=self.__class__.__name__,
+            name=self.name)
+
+    def __unicode__(self):
+        return self.name
 
     @property
     def nodeset(self):
