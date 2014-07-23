@@ -55,7 +55,7 @@ class Bundle(object):
 
         # In case we still don't have a default_page_types by now, the
         # analyzation will not be able to add any annotations.
-        return default_page_types
+        return default_page_types or []
 
     def get_page_types(self):
         page_types = set(self.page_types)

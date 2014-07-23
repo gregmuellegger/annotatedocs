@@ -70,7 +70,6 @@ class AnnotatedHTMLTranslator(HTMLTranslator):
 
 class AnnotatedHTMLBuilder(StandaloneHTMLBuilder):
     allow_parallel = False
-    default_bundle = 'annotatedocs.bundles.default_bundle'
 
     def init_translator_class(self):
         self.translator_class = AnnotatedHTMLTranslator
@@ -94,12 +93,17 @@ class AnnotatedHTMLBuilder(StandaloneHTMLBuilder):
         for warning in warnings:
             self.warn(*warning)
 
-    def get_configured_bundle(self):
-        return getattr(self.app.config, 'annotatedocs_bundle',
-                       self.default_bundle)
-
     def get_bundle(self):
-        bundle_conf = self.get_configured_bundle()
+        # The config will only be set if 'annotatedocs' is listed as an
+        # extension in the conf.py
+
+        # TODO: Fix this by moving all the logic of this into a sphinx
+        # extension.
+        bundle_conf = getattr(
+            self.app.config,
+            'annotatedocs_bundle',
+            'annotatedocs.bundles.default_bundle')
+
         if isinstance(bundle_conf, basestring):
             path_bits = bundle_conf.split('.')
             bundle_name = path_bits.pop(-1)
@@ -125,8 +129,6 @@ class AnnotatedHTMLBuilder(StandaloneHTMLBuilder):
 
 
 class AnnotatedSphinx(Sphinx):
-    default_bundle = 'annotatdocs.bundles.default_bundle'
-
     def __init__(self, *args, **kwargs):
         confoverrides = kwargs.pop('confoverrides', {})
         confoverrides['html_theme'] = 'sphinx_rtd_theme_annotated'
