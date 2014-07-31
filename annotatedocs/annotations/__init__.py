@@ -8,3 +8,4 @@ from ..messages import *
 
 from .base import *
 from .longparagraph import *
+from .longsection import *

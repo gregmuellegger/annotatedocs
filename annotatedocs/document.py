@@ -96,7 +96,7 @@ class Document(object):
 
     @property
     def nodeset(self):
-        return self.nodeset_class(self)
+        return self.nodeset_class([self[self.node]])
 
     def __getitem__(self, node):
         return self.data[node]
@@ -130,6 +130,11 @@ class NodeData(dict):
         self.node = node
         self.document_data = document_data
 
+    def __repr__(self):
+        return '<{class_name}: {node_type}>'.format(
+            class_name=self.__class__.__name__,
+            node_type=self.node.__class__.__name__)
+
     def append(self, key, value):
         self.setdefault(key, []).append(value)
 
@@ -139,6 +144,20 @@ class NodeData(dict):
     @property
     def messages(self):
         return self.get('messages', [])
+
+    @property
+    def children(self):
+        document = self.document_data.document
+        return [document[child] for child in self.node.children]
+
+    def __eq__(self, other):
+        if self.node is None:
+            return self is other
+        return self.node is getattr(other, 'node', None)
+
+    @property
+    def nodeset(self):
+        return NodeSet([self])
 
 
 class DocumentData(object):

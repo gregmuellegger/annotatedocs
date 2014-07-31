@@ -1,29 +1,35 @@
-def filter_nodes(node, check):
+def filter_nodes(nodes, check):
     result = []
-    to_check = [node]
+    to_check = nodes[:]
     while to_check:
         current_node = to_check.pop()
         if check(current_node):
-            result.append(current_node)
+            if current_node not in result:
+                result.append(current_node)
         to_check.extend(reversed(current_node.children))
     return result
 
 
 def lookup(check):
-    def _lookup(document, key, test_value):
+    def _lookup(key, test_value):
         def _test_node(node):
-            data = document[node]
-            if key in data:
-                return check(data[key], test_value)
+            if key in node:
+                return check(node[key], test_value)
             return False
         return _test_node
     return _lookup
 
 
-def exists_lookup(document, key, test_value):
+def exists_lookup(key, test_value):
     def _test_node(node):
-        data = document[node]
-        return key in data
+        exists = key in node
+        # Return true if it exists. But only if we got ``True`` as lookup.
+        if test_value:
+            return exists
+        # If the lookup was filter(key__exists=False) we want to invert the
+        # result.
+        else:
+            return not exists
     return _test_node
 
 
@@ -33,7 +39,7 @@ class NodeSet(object):
 
     An example::
 
-        >>> nodeset = NodeSet(document)
+        >>> nodeset = NodeSet(nodes)
         >>> all_paragraphs = nodeset.filter(type='paragraph')
         >>> print all_paragraphs
         [<paragraph: ...>, <paragraph: ...>]
@@ -49,13 +55,13 @@ class NodeSet(object):
     attribute, like this::
 
         >>> import docutils.nodes
-        >>> nodeset = NodeSet(document)
-        >>> dateitem = nodeset[0]
-        >>> type(dataitem)
+        >>> nodeset = NodeSet(nodes)
+        >>> nodedata = nodeset[0]
+        >>> type(nodedata)
         <class 'annotatedocs.document.NodeData'>
-        >>> isinstance(dataitem, docutils.nodes.Node)
+        >>> isinstance(nodedata, docutils.nodes.Node)
         False
-        >>> isinstance(dataitem.node, docutils.nodes.Node)
+        >>> isinstance(nodedata.node, docutils.nodes.Node)
         True
 
     The API is heavily inspired by django's querysets.
@@ -65,10 +71,6 @@ class NodeSet(object):
 
     # Methods given in lookup_types have a special signature.
     # They take three arguments:
-    #
-    #   ``document``
-    #       The document which was given to the ``NodeSet``'s ``__init__``
-    #       method.
     #
     #   ``key``
     #       The name of the keyword argument before the two underscores. So for
@@ -91,16 +93,14 @@ class NodeSet(object):
         'exists': exists_lookup,
     }
 
-    def __init__(self, document, node=None):
-        self.document = document
-        self.node = node or self.document.node
-
+    def __init__(self, root_nodes):
+        self.root_nodes = list(root_nodes)
         self._filters = []
 
     def __repr__(self):
         nodes = list(self[:11])
         items = ', '.join(
-            unicode(node.__class__.__name__)
+            unicode(node.node.__class__.__name__)
             for node in nodes[:10])
         if len(nodes) > 10:
             items += ', ...'
@@ -110,7 +110,7 @@ class NodeSet(object):
             items=items)
 
     def _clone(self):
-        cloned = self.__class__(self.document)
+        cloned = self.__class__(self.root_nodes)
         cloned._filters = self._filters[:]
         return cloned
 
@@ -162,10 +162,58 @@ class NodeSet(object):
                 raise TypeError(u'Unkown lookup: {}'.format(lookup))
 
             lookup_func = self.lookup_types[lookup_type]
-            filter_func = lookup_func(self.document, key, test_value)
+            filter_func = lookup_func(key, test_value)
             clone._filters.append(filter_func)
 
         return clone
+
+    def subset(self):
+        '''
+        Make the currently filtered nodes the root nodes of a new nodeset.
+        '''
+        clone = self.__class__(list(self))
+        return clone
+
+    def first(self):
+        '''
+        Returns first item of nodeset or None if the nodeset is empty.
+        '''
+
+        try:
+            return list(self)[0]
+        except IndexError:
+            return None
+
+    def children(self):
+        def is_children(node):
+            return any(
+                node in root_node.children
+                for root_node in self.root_nodes)
+        return self.filter(is_children)
+
+    def annotate(self, message):
+        '''
+        Add a annotation to all selected nodes.
+        '''
+        for node in self:
+            node.annotate(message)
+        return self
+
+    def values_list(self, *args, **kwargs):
+        flat = kwargs.pop('flat', False)
+        if not args:
+            raise TypeError(u'You need to provide at least one value name.')
+        if len(args) != 1 and flat:
+            raise TypeError(u'The `flat` keyword can only be used if one value is specified.')
+        if kwargs:
+            raise TypeError(u'Unkown keyword arguments: {}'.format(kwargs.keys()))
+
+        def get_values(node):
+            if flat:
+                return node[args[0]]
+            return [node[key] for key in args]
+
+        return [get_values(node) for node in self]
 
     def _accept_node(self, node):
         for filter_func in self._filters:
@@ -173,22 +221,25 @@ class NodeSet(object):
                 return False
         return True
 
-    def _evaluate(self, node):
+    def _filter_nodes(self, nodes, check, include_children_of_matched=True):
+        result = []
+        to_check = nodes[:]
+        while to_check:
+            current_node = to_check.pop()
+            matched = False
+            if check(current_node):
+                matched = True
+                if current_node not in result:
+                    result.append(current_node)
+            if include_children_of_matched or matched:
+                to_check.extend(reversed(current_node.children))
+        return result
+
+    def _evaluate(self, nodes):
         '''
         Resolves the configured nodeset into a list of nodes.
         '''
-        return filter_nodes(node, self._accept_node)
+        return self._filter_nodes(nodes, self._accept_node)
 
     def __iter__(self):
-        if not hasattr(self, '_result_cache'):
-            self._result_cache = list(self._evaluate(self.node))
-        for node in self._result_cache:
-            yield self.document[node]
-
-    def annotate(self, message):
-        '''
-        Add a annotation to all selected nodes.
-        '''
-        for node in self:
-            self.document[node].annotate(message)
-        return self
+        return iter(self._evaluate(self.root_nodes))
