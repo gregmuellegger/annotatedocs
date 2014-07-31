@@ -1,5 +1,5 @@
 from annotatedocs.bundle import Bundle
-from annotatedocs.annotations import LongSection
+from annotatedocs.annotations import LongSection, PassiveVoice
 from annotatedocs.page_types import PageType, BasicPage, InstallationGuide
 
 
@@ -15,4 +15,5 @@ def named_page(document_name, *annotation_list):
 
 bundle = Bundle(
     InstallationGuide,
-    named_page('basicpage/longsections', LongSection))
+    named_page('basicpage/longsections', LongSection),
+    named_page('basicpage/passivevoice', PassiveVoice))

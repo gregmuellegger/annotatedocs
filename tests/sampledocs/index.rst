@@ -15,6 +15,7 @@ Contents:
    text
    basicpage/longparagraphs
    basicpage/longsections
+   basicpage/passivevoice
 
 
 Indices and tables

@@ -5,7 +5,7 @@ SCRIPTPATH=`pwd`
 popd > /dev/null
 
 cd $SCRIPTPATH/tests/sampledocs
-make html
+annotatedocs
 
 cd $SCRIPTPATH
 py.test tests/

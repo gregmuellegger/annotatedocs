@@ -1,4 +1,4 @@
-from ..annotations import LongParagraph
+from ..annotations import LongParagraph, PassiveVoice
 from .base import PageType
 
 
@@ -13,6 +13,7 @@ class BasicPage(PageType):
 
     annotations = [
         LongParagraph,
+        PassiveVoice,
     ]
 
     def match(self, document):

@@ -22,6 +22,12 @@ VERB_PAST_PARTICIBLE = 'VBN'
 pos_tagger = PerceptronTagger()
 
 
+def get_pos_tags(text):
+    blob = TextBlob(text, pos_tagger=pos_tagger)
+    tags = blob.tags
+    return tags
+
+
 def is_to_be(tags, position):
     '''
     Returns a positive number if the tags contain a form of to be at
@@ -56,12 +62,11 @@ def index_passive_voice_phrase(tags, position):
     return -1
 
 
-def get_passive_voice_phrases(text):
+def get_passive_voice_phrases(tags):
     '''
+    Takes a list of part of speech tagged tags.
     Returns a list of phrases that seem to be in passive voice.
     '''
-    blob = TextBlob(text, pos_tagger=pos_tagger)
-    tags = blob.tags
     passive_voice_phrases = []
     i = 0
     while i < len(tags):
