@@ -1,4 +1,5 @@
-from . import Annotation, Hint
+from . import Check
+from ..annotations import Hint
 from ..metrics import Metric, WordStats
 
 
@@ -13,7 +14,7 @@ class SectionWordCount(Metric):
     def limit(self, nodeset):
         return nodeset.filter(type='section')
 
-    def apply(self, node):
+    def apply(self, node, document):
         # TODO: Querying does not work reliably yet. It counts words for
         # subsections as well I think.
 
@@ -24,13 +25,13 @@ class SectionWordCount(Metric):
         node['section_word_count'] = sum(word_counts)
 
 
-class LongSection(Annotation):
+class LongSection(Check):
 
     # 1000 words are about the number of words that fit on two printed book
     # pages. After that we should split up the section if possible.
     threshold = 1100
 
-    required_metrics = Annotation.required_metrics + [
+    required_metrics = Check.required_metrics + [
         SectionWordCount,
     ]
 
@@ -41,7 +42,7 @@ class LongSection(Annotation):
     def limit(self, nodeset):
         return nodeset.filter(type='section')
 
-    def apply(self, nodeset, document):
+    def check(self, nodeset, document):
         for section in nodeset.filter(section_word_count__gt=300):
             title = section.nodeset.filter(type='headline').first()
             if title:

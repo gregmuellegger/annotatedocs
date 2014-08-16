@@ -21,7 +21,7 @@ class WordStats(Metric):
     def limit(self, nodeset):
         return nodeset.filter(is_content_type=True)
 
-    def apply(self, node):
+    def apply(self, node, document):
         text = node.node.astext()
         sentences = [
             nltk.word_tokenize(sentence)

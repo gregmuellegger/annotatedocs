@@ -20,7 +20,7 @@ class NodeType(Metric):
 
     content_types = ['headline', 'paragraph']
 
-    def apply(self, node):
+    def apply(self, node, document):
         class_name = node.node.__class__.__name__
         node_type = self.class_to_type.get(class_name, class_name)
         node['class_name'] = class_name

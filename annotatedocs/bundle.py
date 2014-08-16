@@ -10,7 +10,7 @@ class Bundle(object):
     You can make your own bundle of page types and specify it like this in your
     ``conf.py``::
 
-        annotatedocs_bundle = 'myproject.annotations.project_bundle'
+        annotatedocs_bundle = 'myproject.docchecks.project_bundle'
 
     TODO: Implement the conf.py support.
     '''
@@ -54,7 +54,7 @@ class Bundle(object):
                     break
 
         # In case we still don't have a fallback_page_types by now, the
-        # analyzation will not be able to add any annotations.
+        # analyzation will not be able to apply any checks.
         return fallback_page_types or []
 
     def get_page_types(self):

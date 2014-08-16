@@ -1,12 +1,13 @@
-from . import Annotation, Hint
+from . import Check
+from ..annotations import Hint
 from ..metrics import PassiveVoicePhrases
 
 
 __all__ = ('PassiveVoice',)
 
 
-class PassiveVoice(Annotation):
-    required_metrics = Annotation.required_metrics + [
+class PassiveVoice(Check):
+    required_metrics = Check.required_metrics + [
         PassiveVoicePhrases,
     ]
 
@@ -18,7 +19,7 @@ class PassiveVoice(Annotation):
     def limit(self, nodeset):
         return nodeset.filter(passive_voice_phrases__exists=True)
 
-    def apply(self, nodeset, document):
+    def check(self, nodeset, document):
         for node in nodeset.all():
             phrases = node['passive_voice_phrases']
             phrases = ['"{0}"'.format(phrase) for phrase in phrases]

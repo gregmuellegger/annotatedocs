@@ -1,11 +1,11 @@
 from annotatedocs.bundle import Bundle
-from annotatedocs.annotations import LongSection, PassiveVoice
+from annotatedocs.checks import LongSection, PassiveVoice
 from annotatedocs.page_types import PageType, BasicPage, InstallationGuide
 
 
-def named_page(document_name, *annotation_list):
+def named_page(document_name, *additional_checks):
     class NamedPage(PageType):
-        annotations = PageType.annotations + list(annotation_list)
+        checks = PageType.checks + list(additional_checks)
 
         def match(self, document):
             return document.name == document_name

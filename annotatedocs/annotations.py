@@ -4,7 +4,8 @@ __all__ = ('Message', 'Hint', 'Warning')
 class Message(object):
     level = None
 
-    def __init__(self, message, level=None, format_args=None, format_kwargs=None):
+    def __init__(self, message, level=None, format_args=None,
+                 format_kwargs=None):
         self.message = message
         self.level = level or self.level
         self.format_args = format_args or []
@@ -22,8 +23,10 @@ class Message(object):
         format_args = list(self.format_args) + list(args)
         format_kwargs = self.format_kwargs.copy()
         format_kwargs.update(kwargs)
-        return self.__class__(self.message, self.level,
-                              format_args, format_kwargs)
+        return self.__class__(message=self.message,
+                              level=self.level,
+                              format_args=format_args,
+                              format_kwargs=format_kwargs)
 
     def get_message(self):
         return self.message.format(

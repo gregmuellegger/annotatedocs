@@ -7,29 +7,29 @@ __all__ = ('PageType',)
 class PageType(MetricRequirementMixin, object):
     '''
     For every document in the documentation will be a page type determined that
-    matches the kind of document. The page type then holds the annotations that
-    shall be checked against the document.
+    matches the kind of document. The page type then holds the checks that
+    shall be applied against the document.
 
-    That way you can have different annotations which only will only applied
-    for the documents that they are relevant for.
+    That way you can have different checks which only will applied to the
+    documents that they are relevant for.
 
     Page types can be grouped into bundles. See the ``Bundle`` class for more
     information.
     '''
     name = None
-    annotations = []
+    checks = []
 
-    def get_annotations(self):
+    def get_checks(self):
         '''
-        This returns the annotations that should be checked and applied to the
-        document which matches this page type.
+        This returns the checks that should be applied to the document which
+        matches this page type.
 
         You can customize the behaviour based on the input gather during the
-        ``match()`` call. This is usefull to apply different annotations
+        ``match()`` call. This is usefull to apply different checks
         depending on how good the page type matched or if it contained this or
         that metric.
         '''
-        return list(self.annotations)
+        return list(self.checks)
 
     def match(self, document):
         '''
@@ -37,15 +37,15 @@ class PageType(MetricRequirementMixin, object):
         '''
         raise NotImplementedError('Needs to be implemented by subclass.')
 
-    def apply_annotations(self, document):
-        for annotation in self.get_annotations():
-            # We accept annotation classes and instances. We instantiate those
+    def apply_checks(self, document):
+        for check in self.get_checks():
+            # We accept check classes and instances. We instantiate those
             # that were provided as classes.
-            if isinstance(annotation, type):
-                annotation = annotation()
+            if isinstance(check, type):
+                check = check()
 
-            document.apply_metrics(annotation.get_required_metrics())
+            document.apply_metrics(check.get_required_metrics())
 
             nodeset = document.nodeset.all()
-            nodeset = annotation.limit(nodeset)
-            annotation.apply(nodeset, document)
+            nodeset = check.limit(nodeset)
+            check.check(nodeset, document)

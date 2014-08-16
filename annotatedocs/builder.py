@@ -40,7 +40,7 @@ class AnnotatedHTMLTranslator(HTMLTranslator):
                 for message in messages])
             attributes[attribute] = json_data
 
-    def apply_annotations(self, node):
+    def apply_checks(self, node):
         attributes = {}
 
         if self.is_first_visible_node(node):
@@ -63,7 +63,7 @@ class AnnotatedHTMLTranslator(HTMLTranslator):
 
     def starttag(self, node, tagname, suffix='\n', empty=False, **attributes):
         if self.annotate:
-            attributes.update(self.apply_annotations(node))
+            attributes.update(self.apply_checks(node))
         return HTMLTranslator.starttag(self, node, tagname, suffix=suffix,
                                        empty=empty, **attributes)
 
@@ -124,7 +124,7 @@ class AnnotatedHTMLBuilder(StandaloneHTMLBuilder):
         self.document_structure = DocumentStructure(self.doctrees_by_docname,
                                                     bundle=self.get_bundle())
         # Kick off the analyzing step. This includes finding the page types and
-        # adding the annotations to the relevant nodes.
+        # checking the relevant nodes for flaws.
         self.document_structure.analyze()
 
 

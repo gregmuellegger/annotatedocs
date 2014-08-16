@@ -1,4 +1,4 @@
-from ..annotations import LongParagraph, PassiveVoice
+from ..checks import LongParagraph, PassiveVoice
 from .base import PageType
 
 
@@ -11,7 +11,7 @@ class BasicPage(PageType):
     all page can benefit from.
     '''
 
-    annotations = [
+    checks = [
         LongParagraph,
         PassiveVoice,
     ]

@@ -22,8 +22,8 @@ class DocumentStructure(object):
     of documents as key and a ``Document`` instance as value.
 
     The ``Document`` instances will usually hold a reference to the structure.
-    This allows traversing the whole document structure in order to related
-    annotations to other documents.
+    This allows traversing the whole document structure in order to attach
+    annotations to related documents.
     '''
 
     def __init__(self, documents, bundle):
@@ -110,7 +110,7 @@ class Document(object):
         nodeset = self.nodeset.all()
         nodeset = metric.limit(nodeset)
         for node in nodeset:
-            metric.apply(node)
+            metric.apply(node, self)
 
         self.applied_metrics.add(metric_class)
 
@@ -121,7 +121,7 @@ class Document(object):
     def analyze(self):
         self.page_types = self.bundle.determine_page_types(document=self)
         for page_type in self.page_types:
-            page_type.apply_annotations(document=self)
+            page_type.apply_checks(document=self)
         self.is_analyzed = True
 
 
