@@ -52,8 +52,8 @@ def main(docs, build_dir, tmp_dir, recreate, debug, w):
         with log_handler.applicationbound():
 
             loader = get_loader(docs,
-                                        build_dir=build_dir,
-                                        tmp_dir=tmp_dir)
+                                build_dir=build_dir,
+                                tmp_dir=tmp_dir)
 
             if recreate:
                 loader.cleanup()

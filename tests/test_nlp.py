@@ -70,6 +70,24 @@ class TestGetPassiveVoicePhrases(object):
     def test_active_voice(self):
         text = "Why did the chicken cross the road?"
         phrases = self.get_phrases(text)
+        assert len(phrases) == 0
 
         text = "The chicken crossed the road."
         phrases = self.get_phrases(text)
+        assert len(phrases) == 0
+
+    def test_to_be_past_participle_which_is_no_passive_voice(self):
+        text = 'I am perplexed.'
+        phrases = self.get_phrases(text)
+
+        assert len(phrases) == 0
+
+        text = 'You are worried.'
+        phrases = self.get_phrases(text)
+
+        assert len(phrases) == 0
+
+        text = 'He was astonished.'
+        phrases = self.get_phrases(text)
+
+        assert len(phrases) == 0

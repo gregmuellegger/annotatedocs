@@ -29,6 +29,11 @@ def get_loader(path, **kwargs):
 
 class Loader(object):
     '''
+    A loader class takes care of determining the location of where to find the
+    documentation source files. It also prepares the environment for the build
+    and then calls the actual build in the form of the ``AnnotatedSphinx``
+    class.
+
     A loader class is reponsible for the following things:
 
         * Defining the tmp dir where temporary files can be placed, e.g. for
@@ -82,6 +87,19 @@ class Loader(object):
     def get_build_dir(self):
         return self.build_dir
 
+    def get_docs_dir(self):
+        raise NotImplementedError('Needs to be implemented by subclass.')
+
+    def get_project_dir(self):
+        '''
+        Should return the base path to the project. If it's a python package it
+        should also contain the ``setup.py`` file.
+        '''
+        raise NotImplementedError('Needs to be implemented by subclass.')
+
+    def get_virtualenv_dir(self):
+        return os.path.join(self.get_tmp_dir(), 'venv')
+
     def setup(self):
         self.doctrees_dir = os.path.join(self.get_tmp_dir(), 'doctrees')
 
@@ -99,9 +117,6 @@ class Loader(object):
         '''
         pass
 
-    def get_docs_dir(self):
-        raise NotImplementedError('Needs to be implemented by subclass.')
-
 #    def check_for_conf(self):
 #        if not os.path.exists(self.docs_path):
 #            raise ValueError('TODO')
@@ -111,16 +126,6 @@ class Loader(object):
 #            raise ValueError('TODO')
 #
 #        pass
-
-    def get_project_dir(self):
-        '''
-        Should return the base path to the project. If it's a python package it
-        should also contain the ``setup.py`` file.
-        '''
-        raise NotImplementedError('Needs to be implemented by subclass.')
-
-    def get_virtualenv_dir(self):
-        return os.path.join(self.get_tmp_dir(), 'venv')
 
     def get_virtualenv_command(self, executable):
         return sh.Command(
@@ -181,16 +186,6 @@ class Loader(object):
         activate_this = os.path.join(virtuelenv_dir, 'bin', 'activate_this.py')
         execfile(activate_this)
 
-    def cleanup(self):
-        '''
-        Delete all cached files that are needed to build the annotated docs.
-        '''
-
-        tmp_dir = self.get_tmp_dir()
-        if os.path.exists(tmp_dir):
-            log.info('Cleaning up (i.e. deleting) {}'.format(tmp_dir))
-            shutil.rmtree(tmp_dir)
-
     def build(self):
         with tempdir() as doctrees_dir:
             app = AnnotatedSphinx(
@@ -207,6 +202,16 @@ class Loader(object):
                 'Build finished. Open file://{path} in your browser to see '
                 'the annotations.'.format(path=index_file))
             return index_file
+
+    def cleanup(self):
+        '''
+        Delete all cached files that are needed to build the annotated docs.
+        '''
+
+        tmp_dir = self.get_tmp_dir()
+        if os.path.exists(tmp_dir):
+            log.info('Cleaning up (i.e. deleting) {}'.format(tmp_dir))
+            shutil.rmtree(tmp_dir)
 
 
 class LocalLoader(Loader):
@@ -230,6 +235,10 @@ class LocalLoader(Loader):
 
 
 class VCSLoader(Loader):
+    '''
+    Base class for other loaders that use a VCS to retrieve the required source
+    files.
+    '''
     def __init__(self, path, *args, **kwargs):
         self.repository_url = path
         self.revision = kwargs.pop('revision', None)
