@@ -1,7 +1,7 @@
-__all__ = ('Message', 'Hint', 'Warning')
+__all__ = ('Annotation', 'Hint', 'Warning')
 
 
-class Message(object):
+class Annotation(object):
     level = None
 
     def __init__(self, message, level=None, format_args=None,
@@ -40,9 +40,9 @@ class Message(object):
         }
 
 
-class Hint(Message):
+class Hint(Annotation):
     level = 'hint'
 
 
-class Warning(Message):
+class Warning(Annotation):
     level = 'warning'
