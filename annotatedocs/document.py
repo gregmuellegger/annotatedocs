@@ -18,7 +18,7 @@ class DocumentStructure(object):
     '''
     This is the document structure as given by the documentation project.
 
-    It holds the ``document_data`` attribute which is dictionary with the name
+    It holds the ``documents`` attribute which is dictionary with the name
     of documents as key and a ``Document`` instance as value.
 
     The ``Document`` instances will usually hold a reference to the structure.
@@ -29,25 +29,25 @@ class DocumentStructure(object):
     def __init__(self, documents, bundle):
         self.bundle = bundle
         self.global_annotations = []
-        self.document_data = {}
+        self.documents = {}
         if documents:
             for name, document in documents.items():
                 self.add_document(name, document)
 
     def add_document(self, name, node):
-        self.document_data[name] = Document(node, self.bundle, name,
+        self.documents[name] = Document(node, self.bundle, name,
                                             structure=self)
 
     def get_document(self, name):
-        return self.document_data[name]
+        return self.documents[name]
 
     def get_global_annotations(self):
         from .annotations import Warning
         return [Warning('This is a global warning')]
 
     def analyze(self):
-        for name, document_data in self.document_data.items():
-            document_data.analyze()
+        for name, document in self.documents.items():
+            document.analyze()
 
 
 class Document(object):
