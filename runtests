@@ -4,8 +4,5 @@ pushd `dirname $0` > /dev/null
 SCRIPTPATH=`pwd`
 popd > /dev/null
 
-cd $SCRIPTPATH/tests/sampledocs
-annotatedocs
-
 cd $SCRIPTPATH
 py.test tests/

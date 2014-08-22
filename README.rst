@@ -39,3 +39,4 @@ The roadmap includes adding a few more features, which are:
 
 * Add an output format option to the command line tool to get an output in JSON
   for easier further processing.
+* Support and testing for more Python versions (mainly Python 3).
