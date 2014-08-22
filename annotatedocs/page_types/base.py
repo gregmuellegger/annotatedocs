@@ -16,6 +16,7 @@ class PageType(MetricRequirementMixin, object):
     Page types can be grouped into bundles. See the ``Bundle`` class for more
     information.
     '''
+
     name = None
     checks = []
 

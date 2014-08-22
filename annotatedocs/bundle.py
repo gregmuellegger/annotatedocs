@@ -1,8 +1,11 @@
+from .utils import instantiate
+
+
 __all__ = ('Bundle',)
 
 
 class Bundle(object):
-    '''
+    """
     A bundle is a group of page types. It exists to make it easy to create the
     set of page types that can then be configured in the ``conf.py`` of a
     sphinx documentation project.
@@ -13,7 +16,7 @@ class Bundle(object):
         annotatedocs_bundle = 'myproject.docchecks.project_bundle'
 
     TODO: Implement the conf.py support.
-    '''
+    """
 
     fallback_page_types = None
 
@@ -25,6 +28,8 @@ class Bundle(object):
             if isinstance(arg, Bundle):
                 self.bundles.append(arg)
             else:
+                # Accept instance or class.
+                arg = instantiate(arg)
                 self.page_types.append(arg)
 
         self.fallback_page_types = kwargs.pop(
@@ -63,14 +68,13 @@ class Bundle(object):
             page_types.update(bundle.get_page_types())
         return page_types
 
-    def match_page_type_class(self, page_type_class, document):
-        page_type = page_type_class()
+    def get_page_type_match(self, page_type, document):
         document.apply_metrics(page_type.get_required_metrics())
         match = page_type.match(document=document)
         return page_type, match
 
     def should_select_page_type(self, page_type, document, match):
-        '''
+        """
         A page type will return a match between 0 and 1. That's what the API
         defines. This is the method to check if the match is ok enough so that
         we allow the analyzation of the document with the given page type.
@@ -81,29 +85,27 @@ class Bundle(object):
         is accepted for the given document.
 
         Return ``True`` if the page type should be selected.
-        '''
+        """
         return match > 0
 
     def determine_page_types(self, document):
-        '''
+        """
         This is a good place to customize if you have defined your own bundle
         and want to get crazy about how the categories are matched to the
         documents.
-        '''
+        """
 
         matched_page_types = []
-        for page_type_class in self.get_page_types():
-            page_type, match = self.match_page_type_class(page_type_class,
-                                                          document)
+        for page_type in self.get_page_types():
+            match = self.get_page_type_match(page_type, document)
             if self.should_select_page_type(page_type, document, match):
                 matched_page_types.append(page_type)
 
         # We have no matched page type. So we apply the fallback page types,
         # without checking the match.
         if not matched_page_types:
-            for page_type_class in self.get_fallback_page_types():
-                page_type, match = self.match_page_type_class(page_type_class,
-                                                              document)
+            for page_type in self.get_fallback_page_types():
+                match = self.get_page_type_match(page_type, document)
                 matched_page_types.append(page_type)
 
         return matched_page_types

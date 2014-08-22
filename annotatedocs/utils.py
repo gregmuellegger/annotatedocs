@@ -35,3 +35,14 @@ class tempdir(object):
     def __exit__(self, etype, value, traceback):
         if os.path.exists(self.temp_path):
             shutil.rmtree(self.temp_path)
+
+
+def instantiate(instance_or_class):
+    """
+    Get a object and return and instantiate it without arguments if it is a
+    class. Otherwise just return the object.
+    """
+
+    if isinstance(instance_or_class, type):
+        return instance_or_class()
+    return instance_or_class

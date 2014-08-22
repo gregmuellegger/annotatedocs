@@ -16,7 +16,12 @@ class MetricRequirementMixin(object):
                 ComplexMetric,
             ]
 
-    Unfortunatelly the ``required_metrics`` attribute can be altered in the
+    You can either give metric classes or instances of metric classes. Giving
+    metric classes is prefered since we check for the object ID to see if we
+    already have applied this metric yet. So if you give the same metric as two
+    different instances, it will be applied twice.
+
+    Unfortunatelly the ``required_metrics`` attribute cannot be altered in the
     instance of classes. Actually it can be altered, but won't have any effect.
     The reason is that the ``get_required_metrics`` method is implemented as a
     classmethod which only has access to the **class** attributes, not to the
@@ -49,10 +54,6 @@ class MetricRequirementMixin(object):
 
 
 class Metric(MetricRequirementMixin, object):
-    @property
-    def data(self):
-        return self.document.node_data
-
     def limit(self, nodeset):
         '''
         Subclasses can limit down the nodeset they want to be applied against.
