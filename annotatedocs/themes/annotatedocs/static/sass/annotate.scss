@@ -1,0 +1,169 @@
+@import "wyrm_defaults";
+@import "clearfix";
+
+
+// annotatedocs style
+
+$annotate-text-color: #ffffff;
+$annotate-warning-color: #ff4400;
+$annotate-hint-color: #ffdd00;
+$annotate-global-warning-color: #aa00aa;
+
+.annotations-toolbox {
+  .annotations-head {
+    @include clearfix;
+
+    padding: $base-line-height / 2;
+    background-color: darken($menu-background-color, 5%);
+    display: block;
+    font-size: 90%;
+    cursor: pointer;
+
+    .fa-caret-down {
+      float: right;
+    }
+    .annotations-title {
+      .fa {
+        color: $section-background-color;
+      }
+      .fa-bell {
+        color: $annotate-hint-color;
+        display: none;
+      }
+      .fa-warning {
+        color: $annotate-warning-color;
+        display: none;
+      }
+      .fa-sitemap {
+        color: $annotate-global-warning-color;
+        display: none;
+      }
+    }
+  }
+
+  &.shift-up .annotations-detail {
+    display: block;
+  }
+  .annotations-detail {
+    font-size: 90%;
+    padding: $base-line-height / 2;
+    color: $text-medium;
+    display: none;
+    hr {
+      display: block;
+      height: 1px;
+      border: 0;
+      margin: 20px 0;
+      padding: 0;
+      border-top: solid 1px lighten($menu-background-color, 5%);
+    }
+    dd {
+      display: inline-block;
+      margin: 0;
+
+      a {
+        display: inline-block;
+        padding: $base-line-height / 4;
+        color: $section-background-color;
+      }
+    }
+
+    label {
+      display: none;
+      padding: 5px;
+    }
+  }
+}
+
+.annotations {
+  .annotation {
+    font-size: 1rem;
+    font-family: $base-font-family;
+    font-weight: normal;
+  }
+}
+
+html.page-hide-warnings .has-warnings .annotation-warning {
+  display: none !important;
+}
+html.page-hide-hints .has-hints .annotation-hint {
+  display: none !important;
+}
+
+html:not(.page-hide-warnings) .has-warnings,
+html:not(.page-hide-hints) .has-hints,
+.global-warnings {
+  margin-bottom: 1em;
+
+  .annotation:before {
+    @extend .fa;
+    padding-right: 5px;
+  }
+
+  .annotation {
+    display: block;
+    color: $annotate-text-color;
+    padding: 5px;
+    text-align: left;
+  }
+
+  .annotation-hint {
+    color: #444444;
+    background-color: $annotate-hint-color;
+  }
+
+  .annotation-hint:before {
+    @extend .fa-bell
+  }
+
+  .annotation-warning {
+    background-color: $annotate-warning-color;
+  }
+
+  .annotation-warning:before {
+    @extend .fa-warning;
+  }
+}
+
+html:not(.page-hide-hints) .has-hints {
+  border: solid 3px $annotate-hint-color;
+}
+
+html:not(.page-hide-warnings) .has-warnings {
+  border: solid 3px $annotate-warning-color;
+}
+
+.global-warnings {
+  border: solid 3px $annotate-global-warning-color;
+
+  .annotation {
+    @extend .fa-sitemap;
+    background-color: $annotate-global-warning-color;
+
+  }
+}
+
+.page-has-hints {
+  .annotations-title .fa-bell {
+    display: inline !important;
+  }
+  .annotations-detail label[for=show_hints] {
+    display: inline !important;
+
+  }
+}
+
+.page-has-warnings {
+  .annotations-title .fa-warning {
+    display: inline !important;
+  }
+  .annotations-detail label[for=show_warnings] {
+    display: inline !important;
+  }
+}
+
+.page-has-global-annotations {
+  .annotations-title .fa-sitemap {
+    display: inline !important;
+  }
+}

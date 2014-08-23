@@ -1,6 +1,6 @@
 import json
 
-import sphinx_rtd_theme_annotated
+import sphinx_rtd_theme
 from sphinx.application import Sphinx
 from sphinx.writers.html import HTMLTranslator
 from sphinx.builders.html import StandaloneHTMLBuilder
@@ -131,8 +131,13 @@ class AnnotatedHTMLBuilder(StandaloneHTMLBuilder):
 class AnnotatedSphinx(Sphinx):
     def __init__(self, *args, **kwargs):
         confoverrides = kwargs.pop('confoverrides', {})
-        confoverrides['html_theme'] = 'sphinx_rtd_theme_annotated'
-        confoverrides['html_theme_path'] = [sphinx_rtd_theme_annotated.get_html_theme_path()]
+
+        # TODO: We force the 'annotatedocs' theme here. We should change the
+        # theme so that all other themes are supported.
+        confoverrides['html_theme'] = 'annotatedocs'
+        confoverrides['html_theme_path'] = [sphinx_rtd_theme.get_html_theme_path()]
+
         kwargs['confoverrides'] = confoverrides
         super(AnnotatedSphinx, self).__init__(*args, **kwargs)
+
         self.builder = AnnotatedHTMLBuilder(self)

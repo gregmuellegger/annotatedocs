@@ -1,0 +1,127 @@
+.annotations-toolbox .annotations-head {
+  padding: 12px;
+  background-color: #272525;
+  display: block;
+  font-size: 90%;
+  cursor: pointer; }
+  .annotations-toolbox .annotations-head:after {
+    content: "";
+    display: table;
+    clear: both; }
+  .annotations-toolbox .annotations-head .fa-caret-down {
+    float: right; }
+  .annotations-toolbox .annotations-head .annotations-title .fa, .annotations-toolbox .annotations-head .annotations-title html:not(.page-hide-warnings) .has-warnings .annotation:before, html:not(.page-hide-warnings) .has-warnings .annotations-toolbox .annotations-head .annotations-title .annotation:before,
+  .annotations-toolbox .annotations-head .annotations-title html:not(.page-hide-hints) .has-hints .annotation:before,
+  html:not(.page-hide-hints) .has-hints .annotations-toolbox .annotations-head .annotations-title .annotation:before,
+  .annotations-toolbox .annotations-head .annotations-title .global-warnings .annotation:before,
+  .global-warnings .annotations-toolbox .annotations-head .annotations-title .annotation:before {
+    color: #fcfcfc; }
+  .annotations-toolbox .annotations-head .annotations-title .fa-bell, .annotations-toolbox .annotations-head .annotations-title html:not(.page-hide-warnings) .has-warnings .annotation-hint:before, html:not(.page-hide-warnings) .has-warnings .annotations-toolbox .annotations-head .annotations-title .annotation-hint:before,
+  .annotations-toolbox .annotations-head .annotations-title html:not(.page-hide-hints) .has-hints .annotation-hint:before,
+  html:not(.page-hide-hints) .has-hints .annotations-toolbox .annotations-head .annotations-title .annotation-hint:before,
+  .annotations-toolbox .annotations-head .annotations-title .global-warnings .annotation-hint:before,
+  .global-warnings .annotations-toolbox .annotations-head .annotations-title .annotation-hint:before {
+    color: #ffdd00;
+    display: none; }
+  .annotations-toolbox .annotations-head .annotations-title .fa-warning, .annotations-toolbox .annotations-head .annotations-title html:not(.page-hide-warnings) .has-warnings .annotation-warning:before, html:not(.page-hide-warnings) .has-warnings .annotations-toolbox .annotations-head .annotations-title .annotation-warning:before,
+  .annotations-toolbox .annotations-head .annotations-title html:not(.page-hide-hints) .has-hints .annotation-warning:before,
+  html:not(.page-hide-hints) .has-hints .annotations-toolbox .annotations-head .annotations-title .annotation-warning:before,
+  .annotations-toolbox .annotations-head .annotations-title .global-warnings .annotation-warning:before,
+  .global-warnings .annotations-toolbox .annotations-head .annotations-title .annotation-warning:before {
+    color: #ff4400;
+    display: none; }
+  .annotations-toolbox .annotations-head .annotations-title .fa-sitemap, .annotations-toolbox .annotations-head .annotations-title .global-warnings .annotation, .global-warnings .annotations-toolbox .annotations-head .annotations-title .annotation {
+    color: #aa00aa;
+    display: none; }
+.annotations-toolbox.shift-up .annotations-detail {
+  display: block; }
+.annotations-toolbox .annotations-detail {
+  font-size: 90%;
+  padding: 12px;
+  color: gray;
+  display: none; }
+  .annotations-toolbox .annotations-detail hr {
+    display: block;
+    height: 1px;
+    border: 0;
+    margin: 20px 0;
+    padding: 0;
+    border-top: solid 1px #413d3d; }
+  .annotations-toolbox .annotations-detail dd {
+    display: inline-block;
+    margin: 0; }
+    .annotations-toolbox .annotations-detail dd a {
+      display: inline-block;
+      padding: 6px;
+      color: #fcfcfc; }
+  .annotations-toolbox .annotations-detail label {
+    display: none;
+    padding: 5px; }
+
+.annotations .annotation {
+  font-size: 1rem;
+  font-family: "Helvetica Neue", Arial, sans-serif;
+  font-weight: normal; }
+
+html.page-hide-warnings .has-warnings .annotation-warning {
+  display: none !important; }
+
+html.page-hide-hints .has-hints .annotation-hint {
+  display: none !important; }
+
+html:not(.page-hide-warnings) .has-warnings,
+html:not(.page-hide-hints) .has-hints,
+.global-warnings {
+  margin-bottom: 1em; }
+  html:not(.page-hide-warnings) .has-warnings .annotation:before,
+  html:not(.page-hide-hints) .has-hints .annotation:before,
+  .global-warnings .annotation:before {
+    padding-right: 5px; }
+  html:not(.page-hide-warnings) .has-warnings .annotation,
+  html:not(.page-hide-hints) .has-hints .annotation,
+  .global-warnings .annotation {
+    display: block;
+    color: white;
+    padding: 5px;
+    text-align: left; }
+  html:not(.page-hide-warnings) .has-warnings .annotation-hint,
+  html:not(.page-hide-hints) .has-hints .annotation-hint,
+  .global-warnings .annotation-hint {
+    color: #444444;
+    background-color: #ffdd00; }
+  html:not(.page-hide-warnings) .has-warnings .annotation-warning,
+  html:not(.page-hide-hints) .has-hints .annotation-warning,
+  .global-warnings .annotation-warning {
+    background-color: #ff4400; }
+
+html:not(.page-hide-hints) .has-hints {
+  border: solid 3px #ffdd00; }
+
+html:not(.page-hide-warnings) .has-warnings {
+  border: solid 3px #ff4400; }
+
+.global-warnings {
+  border: solid 3px #aa00aa; }
+  .global-warnings .annotation {
+    background-color: #aa00aa; }
+
+.page-has-hints .annotations-title .fa-bell, .page-has-hints .annotations-title html:not(.page-hide-warnings) .has-warnings .annotation-hint:before, html:not(.page-hide-warnings) .has-warnings .page-has-hints .annotations-title .annotation-hint:before,
+.page-has-hints .annotations-title html:not(.page-hide-hints) .has-hints .annotation-hint:before,
+html:not(.page-hide-hints) .has-hints .page-has-hints .annotations-title .annotation-hint:before,
+.page-has-hints .annotations-title .global-warnings .annotation-hint:before,
+.global-warnings .page-has-hints .annotations-title .annotation-hint:before {
+  display: inline !important; }
+.page-has-hints .annotations-detail label[for=show_hints] {
+  display: inline !important; }
+
+.page-has-warnings .annotations-title .fa-warning, .page-has-warnings .annotations-title html:not(.page-hide-warnings) .has-warnings .annotation-warning:before, html:not(.page-hide-warnings) .has-warnings .page-has-warnings .annotations-title .annotation-warning:before,
+.page-has-warnings .annotations-title html:not(.page-hide-hints) .has-hints .annotation-warning:before,
+html:not(.page-hide-hints) .has-hints .page-has-warnings .annotations-title .annotation-warning:before,
+.page-has-warnings .annotations-title .global-warnings .annotation-warning:before,
+.global-warnings .page-has-warnings .annotations-title .annotation-warning:before {
+  display: inline !important; }
+.page-has-warnings .annotations-detail label[for=show_warnings] {
+  display: inline !important; }
+
+.page-has-global-annotations .annotations-title .fa-sitemap, .page-has-global-annotations .annotations-title .global-warnings .annotation, .global-warnings .page-has-global-annotations .annotations-title .annotation {
+  display: inline !important; }

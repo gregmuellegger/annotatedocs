@@ -40,8 +40,13 @@ setup(
         'slumber',
         'Sphinx',
         'virtualenv',
-        'sphinx_rtd_theme_annotated',
+        'sphinx_rtd_theme',
     ],
+    entry_points = {
+        'sphinx_themes': [
+            'path = annotatedocs.themes:get_path',
+        ]
+    },
     url='',
     license=u'Copyright by Gregor Müllegger',
     description='',

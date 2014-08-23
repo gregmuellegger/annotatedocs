@@ -1,0 +1,8 @@
+{% extends "sphinx_rtd_theme/layout.html" %}
+
+
+{%- block footer %}
+    {{ super() }}
+    <link rel="stylesheet" href="{{ pathto('_static/css/annotate.css', 1) }}">
+    <script type="text/javascript" src="{{ pathto('_static/js/annotate.js', 1) }}"></script>
+{% endblock %}
