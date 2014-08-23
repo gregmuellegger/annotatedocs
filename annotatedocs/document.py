@@ -1,5 +1,7 @@
 from logbook import Logger
+
 from .nodeset import NodeSet
+from .utils import instantiate
 
 
 log = Logger(__name__)
@@ -101,22 +103,22 @@ class Document(object):
     def __getitem__(self, node):
         return self.data[node]
 
-    def apply_metric(self, metric_class):
-        if metric_class in self.applied_metrics:
+    def apply_metric(self, metric):
+        if metric in self.applied_metrics:
             return
 
         # Finally apply metric.
-        metric = metric_class()
+        metric = instantiate(metric)
         nodeset = self.nodeset.all()
         nodeset = metric.limit(nodeset)
         for node in nodeset:
             metric.apply(node, self)
 
-        self.applied_metrics.add(metric_class)
+        self.applied_metrics.add(metric)
 
-    def apply_metrics(self, metric_classes):
-        for metric_class in metric_classes:
-            self.apply_metric(metric_class)
+    def apply_metrics(self, metrics):
+        for metric in metrics:
+            self.apply_metric(metric)
 
     def analyze(self):
         self.page_types = self.bundle.determine_page_types(document=self)
