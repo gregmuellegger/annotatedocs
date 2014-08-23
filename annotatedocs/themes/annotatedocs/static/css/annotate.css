@@ -71,6 +71,18 @@
   .annotations-toolbox .annotations-detail label {
     display: none;
     padding: 5px; }
+  .annotations-toolbox .annotations-detail .section-title {
+    font-weight: bold;
+    margin-bottom: 0.25em; }
+  .annotations-toolbox .annotations-detail .page-types ul {
+    padding: 0.5em;
+    list-style-type: circle; }
+    .annotations-toolbox .annotations-detail .page-types ul li {
+      font-weight: bold; }
+  .annotations-toolbox .annotations-detail .page-types .no-page-type {
+    font-style: italic; }
+  .annotations-toolbox .annotations-detail .settings {
+    padding: 0.5em; }
 
 .annotations .annotation {
   font-size: 1rem;

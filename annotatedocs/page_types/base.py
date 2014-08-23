@@ -20,6 +20,9 @@ class PageType(MetricRequirementMixin, object):
     name = None
     checks = []
 
+    def __unicode__(self):
+        return unicode(self.name or self.__class__.__name__)
+
     def get_checks(self):
         '''
         This returns the checks that should be applied to the document which

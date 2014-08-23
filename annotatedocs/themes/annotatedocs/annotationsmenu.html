@@ -1,15 +1,31 @@
 <div class="annotations-toolbox" data-toggle="annotations-toolbox" role="note" aria-label="annotations">
-  <span class="annotations-head" data-toggle="annotations-head">
-    <span class="fa fa-caret-down"></span>
-    <span class="annotations-title">
-      Annotations
-      <span class="fa fa-bell" title="This page contains hints. See the annotations in the content for more information."></span>
-      <span class="fa fa-warning" title="This page contains warnings. See the annotations in the content for more information."></span>
-      <span class="fa fa-sitemap" title="You have global warnings. Visit the index page for more information."></span>
+    <span class="annotations-head" data-toggle="annotations-head">
+        <span class="fa fa-caret-down"></span>
+        <span class="annotations-title">
+            Annotations
+            <span class="fa fa-bell" title="This page contains hints. See the annotations in the content for more information."></span>
+            <span class="fa fa-warning" title="This page contains warnings. See the annotations in the content for more information."></span>
+            <span class="fa fa-sitemap" title="You have global warnings. Visit the index page for more information."></span>
+        </span>
     </span>
-  </span>
-  <div class="annotations-detail">
-      <label for="show_warnings"><input type="checkbox" id="show_warnings" checked> Show warnings</label>
-      <label for="show_hints"><input type="checkbox" id="show_hints" checked> Show hints</label>
-  </div>
+    <div class="annotations-detail">
+        <section class="page-types">
+            {% if page_types %}
+            This document was analyzed with the following page types:
+            <ul>
+                {% for page_type in page_types %}
+                <li>{{ page_type|escape }}</li>
+                {% endfor %}
+            </ul>
+            {% else %}
+            <span class="no-page-type">Couldn't find a matching page type for this document.</span>
+            {% endif %}
+        </section>
+
+        <section class="settings">
+            <div class="section-title">Settings</div>
+            <label for="show_warnings"><input type="checkbox" id="show_warnings" checked> Show warnings</label>
+            <label for="show_hints"><input type="checkbox" id="show_hints" checked> Show hints</label>
+        </section>
+    </div>
 </div>

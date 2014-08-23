@@ -39,6 +39,7 @@ $annotate-global-warning-color: #aa00aa;
     .fa-caret-down {
       float: right;
     }
+
     .annotations-title {
       .fa {
         color: $section-background-color;
@@ -88,6 +89,30 @@ $annotate-global-warning-color: #aa00aa;
     label {
       display: none;
       padding: 5px;
+    }
+
+    .section-title {
+      font-weight: bold;
+      margin-bottom: 0.25em;
+    }
+
+    .page-types {
+      ul {
+        padding: 0.5em;
+        list-style-type: circle;
+
+        li {
+          font-weight: bold;
+        }
+      }
+
+      .no-page-type {
+        font-style: italic;
+      }
+    }
+
+    .settings {
+      padding: 0.5em;
     }
   }
 }

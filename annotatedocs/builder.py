@@ -127,6 +127,14 @@ class AnnotatedHTMLBuilder(StandaloneHTMLBuilder):
         # checking the relevant nodes for flaws.
         self.document_structure.analyze()
 
+    def get_doc_context(self, docname, body, metatags):
+        context = super(AnnotatedHTMLBuilder, self).get_doc_context(docname, body, metatags)
+        document = self.document_structure.documents[docname]
+        context['document_structure'] = self.document_structure
+        context['document'] = document
+        context['page_types'] = document.page_types
+        return context
+
 
 class AnnotatedSphinx(Sphinx):
     def __init__(self, *args, **kwargs):
