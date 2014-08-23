@@ -70,8 +70,7 @@ class Bundle(object):
 
     def get_page_type_match(self, page_type, document):
         document.apply_metrics(page_type.get_required_metrics())
-        match = page_type.match(document=document)
-        return page_type, match
+        return page_type.match(document=document)
 
     def should_select_page_type(self, page_type, document, match):
         """
