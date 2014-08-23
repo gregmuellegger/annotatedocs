@@ -1,3 +1,17 @@
+.badges {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 300px;
+  color: #fcfcfc;
+  background: #1f1d1d;
+  border-top: solid 10px #343131;
+  font-family: "Helvetica Neue", Arial, sans-serif;
+  z-index: 400; }
+  .badges a {
+    color: #2980b9;
+    text-decoration: none; }
+
 .annotations-toolbox .annotations-head {
   padding: 12px;
   background-color: #272525;

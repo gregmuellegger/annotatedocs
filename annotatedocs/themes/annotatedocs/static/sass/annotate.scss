@@ -9,6 +9,23 @@ $annotate-warning-color: #ff4400;
 $annotate-hint-color: #ffdd00;
 $annotate-global-warning-color: #aa00aa;
 
+.badges {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: $nav-desktop-width;
+  color: $section-background-color;
+  background: darken($menu-background-color, 8%);
+  border-top: solid 10px $menu-background-color;
+  font-family: $base-font-family;
+  z-index: $z-index-tray;
+
+  a {
+    color: $link_color;
+    text-decoration: none;
+  }
+}
+
 .annotations-toolbox {
   .annotations-head {
     @include clearfix;

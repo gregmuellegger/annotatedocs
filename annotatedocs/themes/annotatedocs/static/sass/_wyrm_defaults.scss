@@ -1,10 +1,15 @@
 // Variables from the wyrm project used by sphinx_rtd_theme.
 // See: https://github.com/snide/wyrm/blob/master/sass/wyrm_core/_wy_variables.sass
 
+$blue:                                #2980B9;
+
 $base-font-family:                    "Helvetica Neue", Arial, sans-serif !default;
 $base-line-height:                    24px !default;
+$z-index-tray:                        400 !default;
+$nav-desktop-width:                   300px;
+
 $text-color:                          hsl(0,0%,25%) !default;
 $text-medium:                         lighten($text-color,25%) !default;
-
+$link-color:                          $blue;
 $menu-background-color:               rgb(52, 49, 49);
 $section-background-color:            hsl(0,0%,99%);

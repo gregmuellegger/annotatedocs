@@ -5,4 +5,23 @@
     {{ super() }}
     <link rel="stylesheet" href="{{ pathto('_static/css/annotate.css', 1) }}">
     <script type="text/javascript" src="{{ pathto('_static/js/annotate.js', 1) }}"></script>
+
+    {# We would like to add the annotationsmenu.html into the div.badges of the
+    sphinx_rtd_theme/layout.html ... however there is no block to override in
+    the base template so we need use JS or replace ALL of the layout.html. #}
+
+    <script name="badges" type="text/html">
+        <div class="badges">
+            {% include "annotationsmenu.html" %}
+        </div>
+    </script>
+
+    <script type="text/javascript">//<![CDATA[
+        $(document).ready(function () {
+            var template = $('script[type="text/html"][name="badges"]').text(),
+                $template = $(template);
+            console.log($template);
+            $('.wy-grid-for-nav').after($template);
+        });
+    //]]></script>
 {% endblock %}
