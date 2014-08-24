@@ -161,6 +161,11 @@ class NodeData(dict):
     def nodeset(self):
         return NodeSet([self])
 
+    # Alias methods that pass the calls through to the docutils node instance.
+
+    def astext(self):
+        return self.node.astext()
+
 
 class DocumentData(object):
     '''

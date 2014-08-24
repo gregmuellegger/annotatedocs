@@ -16,6 +16,7 @@ Contents:
    basicpage/longparagraphs
    basicpage/longsections
    basicpage/passivevoice
+   basicpage/pep8compliance
 
 
 Indices and tables

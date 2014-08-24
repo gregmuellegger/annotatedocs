@@ -27,3 +27,9 @@ class NodeType(Metric):
         node['type'] = node_type
         if node_type in self.content_types:
             node['is_content_type'] = True
+
+        # TODO: Integrate all attributes.
+        if hasattr(node.node, 'attributes'):
+            attributes = node.node.attributes
+            if 'language' in attributes:
+                node['language'] = attributes['language']
