@@ -15,3 +15,6 @@ theme: css
 
 sampledocs: css
 	annotatedocs tests/sampledocs
+
+test:
+	py.test
