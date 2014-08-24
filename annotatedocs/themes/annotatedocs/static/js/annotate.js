@@ -1,4 +1,14 @@
 $.fn.showAnnotation = function () {
+    var getAnnotationTag = function (annotation) {
+        var $annotation = $('<div class="annotation" />')
+                .addClass('annotation-' + annotation.level)
+                .text(annotation.message);
+        if (annotation.title) {
+            $annotation.attr('title', annotation.title);
+        }
+        return $annotation
+    };
+
     $(this).each(function () {
         var $self = $(this);
 
@@ -24,10 +34,8 @@ $.fn.showAnnotation = function () {
                 $('html').addClass('page-has-warnings');
             }
 
-            $annotations.append(
-                $('<div class="annotation" />')
-                    .addClass('annotation-' + annotation.level)
-                    .text(annotation.message));
+            var $annotation = getAnnotationTag(annotation);
+            $annotations.append($annotation);
         });
     });
 

@@ -1,13 +1,18 @@
+from copy import copy
+
+
 __all__ = ('Annotation', 'Hint', 'Warning')
 
 
 class Annotation(object):
+    title_text = None
     level = None
 
-    def __init__(self, message, level=None, format_args=None,
+    def __init__(self, message, level=None, title_text=None, format_args=None,
                  format_kwargs=None):
         self.message = message
         self.level = level or self.level
+        self.title_text = title_text or self.title_text
         self.format_args = format_args or []
         self.format_kwargs = format_kwargs or {}
 
@@ -23,10 +28,10 @@ class Annotation(object):
         format_args = list(self.format_args) + list(args)
         format_kwargs = self.format_kwargs.copy()
         format_kwargs.update(kwargs)
-        return self.__class__(message=self.message,
-                              level=self.level,
-                              format_args=format_args,
-                              format_kwargs=format_kwargs)
+        duplicate = copy(self)
+        duplicate.format_args = format_args
+        duplicate.format_kwargs = format_kwargs
+        return duplicate
 
     def get_message(self):
         return self.message.format(
@@ -34,10 +39,13 @@ class Annotation(object):
             **self.format_kwargs)
 
     def serialize(self):
-        return {
+        data = {
             'message': self.get_message(),
             'level': self.level,
         }
+        if self.title_text:
+            data['title'] = self.title_text
+        return data
 
 
 class Hint(Annotation):
