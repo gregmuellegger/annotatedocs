@@ -1,6 +1,9 @@
 from annotatedocs.page_types import PageType
 
 
+__all__ = ('NamedPage',)
+
+
 class NamedPage(PageType):
     """
     This page type always matches to the document name given in the init
