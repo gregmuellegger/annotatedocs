@@ -43,9 +43,24 @@ With errors and warnings.
     spam( ham[1], `{eggs: 2}`)
 
 
-And some code that shouldn't be parsed at all.
+And some code that shouldn't be parsed at all, because it's bash.
 
 
 .. code-block:: bash
 
-    python setup.py install
+    if [ -e ~/.allyourbasebelongtous ]
+        rm -rf *
+    fi
+
+
+And some code that is no valid python.
+
+
+.. code-block:: python
+
+    if : True
+    except:
+
+    if [ -e ~/.allyourbasebelongtous ]
+        rm -rf *
+    fi so wrong
