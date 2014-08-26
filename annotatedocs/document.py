@@ -177,6 +177,14 @@ class NodeData(dict):
     def astext(self):
         return self.node.astext()
 
+    @property
+    def attributes(self):
+        """
+        Return an empty dict if the ``attributes`` attribute is not available
+        on this node. This is the case for Text nodes for example.
+        """
+        return getattr(self.node, 'attributes', {})
+
 
 class DocumentData(object):
     '''
