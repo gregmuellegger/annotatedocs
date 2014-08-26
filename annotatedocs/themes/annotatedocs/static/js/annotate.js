@@ -1,83 +1,146 @@
-$.fn.showAnnotation = function () {
-    var getAnnotationTag = function (annotation) {
-        var $annotation = $('<div class="annotation" />')
-                .addClass('annotation-' + annotation.level)
-                .text(annotation.message);
-        if (annotation.title) {
-            $annotation.attr('title', annotation.title);
-        }
-        return $annotation
+(function ($) {
+
+    var Annotation = function (opts) {
+        this.level = opts.level;
+        this.message = opts.message;
+        this.title = opts.title;
+        this.$element = null;
+        this.$annotation = this.render();
+    }
+
+    /*
+     * Get a list of plain JSON objects (read from the HTML attributes) and
+     * return a list of instantiated annotations.
+     */
+    Annotation.instantiate = function (annotations) {
+        return $.map(annotations, function (annotation) {
+            return new Annotation(annotation);
+        });
     };
 
-    $(this).each(function () {
-        var $self = $(this);
-
-        var annotations = $(this).attr('data-annotations');
-        if (!annotations) {
-            return;
+    /*
+     * Return jQuery object that can be used to represent this annotation in
+     * the DOM.
+     */
+    Annotation.prototype.render = function () {
+        var $annotation = $('<div class="annotation" />')
+                .addClass('annotation-' + this.level)
+                .text(this.message);
+        if (this.title) {
+            $annotation.attr('title', this.title);
         }
-        annotations = JSON.parse(annotations);
+        return $annotation;
+    };
 
-        var $annotations = $self.find('.annotations');
+    Annotation.prototype.getOrCreateAnnotationsElement = function ($element) {
+        var $annotations = $element.find('.annotations:first');
         if ($annotations.length == 0) {
-            $annotations = $('<div class="annotations" />').appendTo($self);
+            $annotations = $('<div class="annotations" />');
+            $element.append($annotations);
         }
-        $annotations.empty();
+        return $annotations;
+    };
 
-        $.each(annotations, function (i, annotation) {
-            if (annotation.level == 'hint') {
-                $self.addClass('has-hints');
-                $('html').addClass('page-has-hints');
-            }
-            if (annotation.level == 'warning') {
-                $self.addClass('has-warnings');
-                $('html').addClass('page-has-warnings');
-            }
+    /*
+     * Attach the annotation to the given element in the dom. This will
+     * create the necessary .annotations div inside the element.
+     */
+    Annotation.prototype.attach = function ($element) { if (this.$element !==
+            null) { throw "Can only attach ones, was already attached to: " +
+                this.$element; }
 
-            var $annotation = getAnnotationTag(annotation);
-            $annotations.append($annotation);
-        });
-    });
+        this.$element = $element;
+        var $annotations = this.getOrCreateAnnotationsElement(this.$element);
 
-    // TODO: Check if there are global annotations somehow differently.
-    $('html').addClass('page-has-global-annotations');
+        if (this.level == 'hint') {
+            this.$element.addClass('has-hints');
+            $('html').addClass('page-has-hints');
+        }
+        if (this.level == 'warning') {
+            this.$element.addClass('has-warnings');
+            $('html').addClass('page-has-warnings');
+        }
 
-    return this;
-};
+        $annotations.append(this.$annotation);
+    };
 
-$.fn.addAnnotation  = function (level, message) {
-    $(this).each(function () {
-        var annotations = $(this).attr('data-annotations');
-        if (!annotations) {
-            annotations = [];
-        } else {
+
+    /*
+     * A representation of the document's content.
+     */
+    var Document = function ($element) {
+        this.$element = $element;
+        this.annotations = [];
+        this.documentAnnotations = [];
+        return this;
+    };
+
+    /*
+     * Look for serialized annotations in the DOM and attach them to the
+     * elements.
+     */
+    Document.prototype.init = function () {
+        var self = this;
+        this.$element.find('[data-annotations]').each(function () {
+            var $annotatedElement = $(this);
+            var annotations = $annotatedElement.attr('data-annotations');
+
             annotations = JSON.parse(annotations);
-        }
+            if (!annotations) {
+                return;
+            }
 
-        annotations.push({
-            level: level,
-            message: message
+            annotations = Annotation.instantiate(annotations);
+            $.each(annotations, function (i, annotation) {
+                annotation.attach($annotatedElement);
+                self.annotations.push(annotation);
+            });
         });
 
-        $(this).attr('data-annotations', JSON.stringify(annotations));
-        $(this).showAnnotation();
+        this.$element.find('[data-document-annotations]').each(function () {
+            var annotations = $(this).attr('data-document-annotations');
+            annotations = JSON.parse(annotations);
+            annotations = Annotation.instantiate(annotations);
+            $.each(annotations, function (i, annotation) {
+                self.addDocumentAnnotation(annotation);
+            });
+        });
+    };
+
+    Document.prototype.getOrCreateDocumentAnnotationsElement = function () {
+        var $annotations = this.$element.find('.document-annotations:first');
+        if ($annotations.length == 0) {
+            $annotations = $('<div class="document-annotations" />');
+            this.$element.prepend($annotations);
+        }
+        return $annotations;
+    };
+
+    /*
+     * Attach a document annotation.
+     */
+    Document.prototype.addDocumentAnnotation = function (annotation) {
+        var $annotations = this.getOrCreateDocumentAnnotationsElement();
+        annotation.attach($annotations);
+        this.documentAnnotations.push(annotation);
+    };
+
+
+    $(document).ready(function () {
+        // Init toolbox.
+        $(document).on('click', "[data-toggle='annotations-head']", function() {
+            $("[data-toggle='annotations-toolbox']").toggleClass("shift-up");
+        });
+
+        $(document).on('change', ":input[id=show_warnings]", function() {
+            $('html').toggleClass('page-hide-warnings', !$(this).is(':checked'));
+        });
+        $(document).on('change', ":input[id=show_hints]", function() {
+            $('html').toggleClass('page-hide-hints', !$(this).is(':checked'));
+        });
+
+        var doc = new Document($('[role="main"]'));
+        doc.init();
     });
 
-    return this;
-};
-
-$(document).ready(function () {
-    // Init toolbox.
-    $(document).on('click', "[data-toggle='annotations-head']", function() {
-      $("[data-toggle='annotations-toolbox']").toggleClass("shift-up");
-    });
-
-    $(document).on('change', ":input[id=show_warnings]", function() {
-      $('html').toggleClass('page-hide-warnings', !$(this).is(':checked'));
-    });
-    $(document).on('change', ":input[id=show_hints]", function() {
-      $('html').toggleClass('page-hide-hints', !$(this).is(':checked'));
-    });
-
-    $('[data-annotations]').showAnnotation();
-});
+})(jQuery);
