@@ -44,12 +44,14 @@ class DocumentStructure(object):
         return self.documents[name]
 
     def get_global_annotations(self):
-        from .annotations import Warning
-        return [Warning('This is a global warning')]
+        return self.global_annotations
 
     def analyze(self):
         for name, document in self.documents.items():
             document.analyze()
+
+    def annotate(self, annotation):
+        self.global_annotations.append(annotation)
 
 
 class Document(object):

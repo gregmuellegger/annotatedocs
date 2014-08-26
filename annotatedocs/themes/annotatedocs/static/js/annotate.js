@@ -72,6 +72,7 @@
         this.$element = $element;
         this.annotations = [];
         this.documentAnnotations = [];
+        this.globalAnnotations = [];
         return this;
     };
 
@@ -105,6 +106,15 @@
                 self.addDocumentAnnotation(annotation);
             });
         });
+
+        this.$element.find('[data-global-annotations]').each(function () {
+            var annotations = $(this).attr('data-global-annotations');
+            annotations = JSON.parse(annotations);
+            annotations = Annotation.instantiate(annotations);
+            $.each(annotations, function (i, annotation) {
+                self.addGlobalAnnotation(annotation);
+            });
+        });
     };
 
     Document.prototype.getOrCreateDocumentAnnotationsElement = function () {
@@ -116,13 +126,33 @@
         return $annotations;
     };
 
+    Document.prototype.getOrCreateGlobalAnnotationsElement = function () {
+        var $annotations = this.$element.find('.global-annotations:first');
+        if ($annotations.length == 0) {
+            $annotations = $('<div class="global-annotations" />');
+            this.$element.prepend($annotations);
+        }
+        return $annotations;
+    };
+
     /*
      * Attach a document annotation.
      */
     Document.prototype.addDocumentAnnotation = function (annotation) {
         var $annotations = this.getOrCreateDocumentAnnotationsElement();
         annotation.attach($annotations);
+        $('html').addClass('page-has-document-annotations');
         this.documentAnnotations.push(annotation);
+    };
+
+    /*
+     * Attach a global annotation.
+     */
+    Document.prototype.addGlobalAnnotation = function (annotation) {
+        var $annotations = this.getOrCreateGlobalAnnotationsElement();
+        annotation.attach($annotations);
+        $('html').addClass('page-has-global-annotations');
+        this.globalAnnotations.push(annotation);
     };
 
 

@@ -14,6 +14,8 @@ class HasTableOfContents(Check):
             print node
         if nodeset.count() == 0:
             document.annotate(Warning('You don\'t have a TOC.'))
+            document.structure.annotate(Warning('Global!'))
+        (Warning('You don\'t have a TOC.'))
 
 
 class Homepage(PageType):
