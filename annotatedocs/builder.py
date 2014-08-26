@@ -20,44 +20,46 @@ class AnnotatedHTMLTranslator(HTMLTranslator):
             self.annotate = True
             self.document_structure = builder.document_structure
             self.document_data = self.document_structure.get_document(docname)
+            self._document_annotations_set = False
         else:
             self.annotate = False
 
-    def is_first_visible_node(self, node):
-        '''
-        Determine if the given node will the first rendered one in the
-        document. That is the case if the parent is the document node, and the
-        node is the first child of the document.
-        '''
-        return (
-            node.parent is node.document and
-            node.parent.index(node) == 0)
-
-    def apply_annotation_attribute(self, attributes, attribute, messages):
-        if messages:
+    def apply_annotation_attribute(self, attributes, attribute, annotations):
+        if annotations:
             json_data = json.dumps([
-                message.serialize()
-                for message in messages])
+                annotation.serialize()
+                for annotation in annotations])
             attributes[attribute] = json_data
+
+    def has_set_document_annotations(self):
+        return self._document_annotations_set
+
+    def set_document_annotations(self, attributes):
+        """
+        Set the document annotations to the given node.
+        """
+        self.apply_annotation_attribute(
+            attributes,
+            'data-global-annotations',
+            self.document_structure.get_global_annotations())
+
+        self.apply_annotation_attribute(
+            attributes,
+            'data-document-annotations',
+            self.document_data.get_document_annotations())
+
+        self._document_annotations_set = True
 
     def apply_checks(self, node):
         attributes = {}
 
-        if self.is_first_visible_node(node):
-            self.apply_annotation_attribute(
-                attributes,
-                'data-global-annotations',
-                self.document_structure.get_global_annotations())
-
-            self.apply_annotation_attribute(
-                attributes,
-                'data-document-annotations',
-                self.document_data[node.document].messages)
+        if not self.has_set_document_annotations():
+            self.set_document_annotations(attributes)
 
         self.apply_annotation_attribute(
             attributes,
             'data-annotations',
-            self.document_data[node].messages)
+            self.document_data[node].annotations)
 
         return attributes
 

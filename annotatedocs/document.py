@@ -126,6 +126,17 @@ class Document(object):
             page_type.apply_checks(document=self)
         self.is_analyzed = True
 
+    def annotate(self, *args, **kwargs):
+        """
+        Add annotation to ``document`` node. Use this method to add document
+        wide annotations.
+        """
+        self[self.node].annotate(*args, **kwargs)
+
+    def get_document_annotations(self):
+        return self[self.node].annotations
+
+
 
 class NodeData(dict):
     def __init__(self, node, document_data):
@@ -141,11 +152,11 @@ class NodeData(dict):
         self.setdefault(key, []).append(value)
 
     def annotate(self, message):
-        self.append('messages', message)
+        self.append('annotations', message)
 
     @property
-    def messages(self):
-        return self.get('messages', [])
+    def annotations(self):
+        return self.get('annotations', [])
 
     @property
     def children(self):
