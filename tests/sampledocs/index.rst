@@ -17,11 +17,5 @@ Contents:
    basicpage/longsections
    basicpage/passivevoice
    basicpage/pep8compliance
-
-
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
+   pagetypes/homepage/no_introduction
+   pagetypes/homepage/no_toc
