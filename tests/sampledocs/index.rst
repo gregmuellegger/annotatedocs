@@ -9,13 +9,14 @@ Welcome to documents for testing of annotatedocs's documentation!
 Contents:
 
 .. toctree::
+   :glob:
+   :titlesonly:
    :maxdepth: 2
 
-   installation
    text
    basicpage/longparagraphs
    basicpage/longsections
    basicpage/passivevoice
    basicpage/pep8compliance
-   pagetypes/homepage/no_introduction
-   pagetypes/homepage/no_toc
+   pagetypes/homepage/*
+   pagetypes/installation_guide/*
