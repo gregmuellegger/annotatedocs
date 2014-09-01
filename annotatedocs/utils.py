@@ -1,6 +1,7 @@
-import tempfile
 import os
+import re
 import shutil
+import tempfile
 
 
 class cd(object):
@@ -54,3 +55,27 @@ def instantiate(instance_or_class):
     if isinstance(instance_or_class, type):
         return instance_or_class()
     return instance_or_class
+
+
+def normalize_document_path(filename):
+    WORD_RE = re.compile(r'^[^a-z]*(?P<word>.+?)\s*$', re.IGNORECASE)
+    ACCEPT_NAME_RE = re.compile(r'^.*[a-z]{3}.*$', re.IGNORECASE)
+
+    # Rule 1: Make it lowercase.
+    filename = filename.lower()
+
+    bits = []
+    for bit in filename.split('/'):
+        match = WORD_RE.search(bit)
+        if match:
+            # Rule 2: Remove non-letters from the beginning of the filename.
+            word = match.groupdict()['word']
+            # Rule 3: Replace dashes with underscores.
+            word = word.replace(u'-', u'_')
+            # Rule 4:
+            # Only accept filenames that contain 3 letters or more.
+            if ACCEPT_NAME_RE.match(word):
+                bits.append(word)
+    normalized = u'/'.join(bits)
+    if normalized:
+        return normalized
