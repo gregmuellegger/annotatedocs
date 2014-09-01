@@ -1,7 +1,6 @@
 from urlparse import urlparse
 
-from .base import Metric, require
-from .nodetype import NodeType
+from ...metrics import Metric, NodeType, require
 
 
 __all__ = ('References',)

@@ -3,6 +3,8 @@ import re
 
 from ... import Check, PageType, Hint, metrics
 from ...utils import normalize_document_path
+from ..metrics.references import References
+from ..metrics.sectiontitle import SectionTitle
 from ..metrics.stemmer import Stemmer
 
 
@@ -32,7 +34,7 @@ class HasCodeListing(Check):
             document.annotate(self.annotation)
 
 
-@metrics.require(Stemmer, metrics.NodeType, metrics.SectionTitle)
+@metrics.require(Stemmer, SectionTitle, metrics.NodeType)
 class DependenciesSection(metrics.Metric):
     keywords = set(Stemmer.stem(
         """
@@ -85,7 +87,7 @@ class HasDependencies(Check):
 
 @metrics.require(
     DependenciesSection,
-    metrics.References)
+    References)
 class LinkToDependencies(Check):
     """
     If the page has a section about requirements, make sure that it contains
