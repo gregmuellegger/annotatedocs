@@ -12,6 +12,7 @@ Contents:
     :maxdepth: 2
 
     pagetypes
+    checks
 
 
 Indices and tables

@@ -2,11 +2,11 @@ from ... import Check, Hint, metrics
 from ..metrics import WordStats
 
 
-__all__ = ('LongParagraph',)
+__all__ = ('HasNoLongParagraphs',)
 
 
 @metrics.require(WordStats)
-class LongParagraph(Check):
+class HasNoLongParagraphs(Check):
     threshold = 10
     threshold_string = 'ten'
     message = Hint(

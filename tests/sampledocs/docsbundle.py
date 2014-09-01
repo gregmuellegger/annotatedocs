@@ -1,8 +1,8 @@
 from annotatedocs import Bundle, NamedPage
 
-from annotatedocs.contrib.checks.longsection import LongSection
-from annotatedocs.contrib.checks.passivevoice import PassiveVoice
-from annotatedocs.contrib.checks.pep8 import PEP8Compliance
+from annotatedocs.contrib.checks.has_no_long_sections import HasNoLongSections
+from annotatedocs.contrib.checks.no_passive_voice_used import NoPassiveVoiceUsed
+from annotatedocs.contrib.checks.is_pep8_compliant import IsPEP8Compliant
 from annotatedocs.contrib.pagetypes.homepage import Homepage
 from annotatedocs.contrib.pagetypes.installation_guide import InstallationGuide
 
@@ -15,7 +15,7 @@ def page_type_for_path(path, page_type_class):
 
 bundle = Bundle(
     InstallationGuide,
-    NamedPage('basicpage/longsections', [LongSection]),
-    NamedPage('basicpage/passivevoice', [PassiveVoice]),
-    NamedPage('basicpage/pep8compliance', [PEP8Compliance]),
+    NamedPage('basicpage/longsections', [HasNoLongSections]),
+    NamedPage('basicpage/passivevoice', [NoPassiveVoiceUsed]),
+    NamedPage('basicpage/pep8compliance', [IsPEP8Compliant]),
     page_type_for_path('pagetypes/homepage/', Homepage))

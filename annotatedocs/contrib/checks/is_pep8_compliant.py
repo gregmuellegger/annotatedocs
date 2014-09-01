@@ -2,10 +2,10 @@ from ... import Check, Annotation
 from ..metrics.pep8 import PEP8Metric
 
 
-__all__ = ('PEP8Compliance',)
+__all__ = ('IsPEP8Compliant',)
 
 
-class PEP8Compliance(Check):
+class IsPEP8Compliant(Check):
     required_metrics = Check.required_metrics + [
         PEP8Metric,
     ]

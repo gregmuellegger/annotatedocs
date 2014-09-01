@@ -2,7 +2,7 @@ from ... import Check, Hint, Metric, metrics
 from ..metrics.wordstats import WordStats
 
 
-__all__ = ('LongSection',)
+__all__ = ('HasNoLongSections',)
 
 
 @metrics.require(WordStats)
@@ -22,7 +22,7 @@ class SectionWordCount(Metric):
 
 
 @metrics.require(SectionWordCount)
-class LongSection(Check):
+class HasNoLongSections(Check):
 
     # 1000 words are about the number of words that fit on two printed book
     # pages. After that we should split up the section if possible.

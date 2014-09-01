@@ -2,11 +2,11 @@ from ... import Check, Hint, metrics
 from ..metrics.passivevoicephrases import PassiveVoicePhrases
 
 
-__all__ = ('PassiveVoice',)
+__all__ = ('NoPassiveVoiceUsed',)
 
 
 @metrics.require(PassiveVoicePhrases)
-class PassiveVoice(Check):
+class NoPassiveVoiceUsed(Check):
     message = Hint(
         'The paragraph contains the phrase {phrase} which is put in passive '
         'voice. Consider making this active voice to be clearer about what '
