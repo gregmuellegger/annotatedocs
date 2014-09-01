@@ -1,3 +1,5 @@
+import nltk
+from nltk.stem.porter import PorterStemmer
 from textblob import TextBlob
 from textblob_aptagger import PerceptronTagger
 
@@ -18,8 +20,16 @@ FORMS_OF_TO_BE = (
 VERB_PAST_PARTICIBLE = 'VBN'
 
 
+stemmer = PorterStemmer()
+
 # Maybe speedup the startup.
 pos_tagger = PerceptronTagger()
+
+
+def stem_word(word):
+    stemmed_word = stemmer.stem(word)
+    stemmed_word = stemmed_word.lower()
+    return stemmed_word
 
 
 def get_pos_tags(text):

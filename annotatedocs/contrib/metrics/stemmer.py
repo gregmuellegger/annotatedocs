@@ -1,7 +1,7 @@
-import nltk
-from nltk.stem.porter import PorterStemmer
+from textblob import TextBlob
 
 from ... import Metric, NodeType, metrics
+from .. import nlp
 
 
 __all__ = ('Stemmer',)
@@ -9,23 +9,18 @@ __all__ = ('Stemmer',)
 
 @metrics.require(NodeType)
 class Stemmer(Metric):
-    stemmer_class = PorterStemmer
-
-    def __init__(self, *args, **kwargs):
-        super(Stemmer, self).__init__(*args, **kwargs)
-        self.stemmer = self.stemmer_class()
+    stem_word = staticmethod(nlp.stem_word)
+    word_tokenizer = staticmethod(lambda text: TextBlob(text).words)
 
     def limit(self, nodeset):
         return nodeset.filter(is_content_type=True)
 
-    def stem(self, text):
-        for sentence in nltk.sent_tokenize(text):
-            for token in nltk.word_tokenize(sentence):
-                stemmed_word = self.stemmer.stem(token)
-                yield stemmed_word.lower()
+    @classmethod
+    def stem(cls, text):
+        for word in cls.word_tokenizer(text):
+            yield cls.stem_word(word)
 
     def apply(self, node, document):
-        stemmed_words = node.setdefault('stemmed_words', set())
-        text = node.node.astext()
-        for word in self.stem(text):
-            stemmed_words.add(word)
+        stemmed_words = node.setdefault('stemmed_words', [])
+        stemmed_text = self.stem(node.node.astext())
+        stemmed_words.extend(stemmed_text)
