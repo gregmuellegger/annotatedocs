@@ -24,29 +24,39 @@
     clear: both; }
   .annotations-toolbox .annotations-head .fa-caret-down {
     float: right; }
-  .annotations-toolbox .annotations-head .annotations-title .fa, .annotations-toolbox .annotations-head .annotations-title html:not(.page-hide-warnings) .has-warnings .annotation:before, html:not(.page-hide-warnings) .has-warnings .annotations-toolbox .annotations-head .annotations-title .annotation:before,
-  .annotations-toolbox .annotations-head .annotations-title html:not(.page-hide-hints) .has-hints .annotation:before,
-  html:not(.page-hide-hints) .has-hints .annotations-toolbox .annotations-head .annotations-title .annotation:before,
-  .annotations-toolbox .annotations-head .annotations-title .global-warnings .annotation:before,
-  .global-warnings .annotations-toolbox .annotations-head .annotations-title .annotation:before {
-    color: #fcfcfc; }
-  .annotations-toolbox .annotations-head .annotations-title .fa-bell, .annotations-toolbox .annotations-head .annotations-title html:not(.page-hide-warnings) .has-warnings .annotation-hint:before, html:not(.page-hide-warnings) .has-warnings .annotations-toolbox .annotations-head .annotations-title .annotation-hint:before,
-  .annotations-toolbox .annotations-head .annotations-title html:not(.page-hide-hints) .has-hints .annotation-hint:before,
-  html:not(.page-hide-hints) .has-hints .annotations-toolbox .annotations-head .annotations-title .annotation-hint:before,
-  .annotations-toolbox .annotations-head .annotations-title .global-warnings .annotation-hint:before,
-  .global-warnings .annotations-toolbox .annotations-head .annotations-title .annotation-hint:before {
-    color: #ffdd00;
+  .annotations-toolbox .annotations-head .annotations-title > span {
+    color: #fcfcfc;
     display: none; }
-  .annotations-toolbox .annotations-head .annotations-title .fa-warning, .annotations-toolbox .annotations-head .annotations-title html:not(.page-hide-warnings) .has-warnings .annotation-warning:before, html:not(.page-hide-warnings) .has-warnings .annotations-toolbox .annotations-head .annotations-title .annotation-warning:before,
-  .annotations-toolbox .annotations-head .annotations-title html:not(.page-hide-hints) .has-hints .annotation-warning:before,
-  html:not(.page-hide-hints) .has-hints .annotations-toolbox .annotations-head .annotations-title .annotation-warning:before,
-  .annotations-toolbox .annotations-head .annotations-title .global-warnings .annotation-warning:before,
-  .global-warnings .annotations-toolbox .annotations-head .annotations-title .annotation-warning:before {
-    color: #ff4400;
-    display: none; }
-  .annotations-toolbox .annotations-head .annotations-title .fa-sitemap, .annotations-toolbox .annotations-head .annotations-title .global-warnings .annotation, .global-warnings .annotations-toolbox .annotations-head .annotations-title .annotation {
-    color: #aa00aa;
-    display: none; }
+  .annotations-toolbox .annotations-head .annotations-title .hints-indicator {
+    color: #ffdd00; }
+    .annotations-toolbox .annotations-head .annotations-title .hints-indicator:before {
+      font-family: "FontAwesome";
+      display: inline-block;
+      font-style: normal;
+      font-weight: normal;
+      line-height: 1;
+      text-decoration: inherit;
+      content: "\f0f3"; }
+  .annotations-toolbox .annotations-head .annotations-title .warnings-indicator {
+    color: #ff4400; }
+    .annotations-toolbox .annotations-head .annotations-title .warnings-indicator:before {
+      font-family: "FontAwesome";
+      display: inline-block;
+      font-style: normal;
+      font-weight: normal;
+      line-height: 1;
+      text-decoration: inherit;
+      content: "\f071"; }
+  .annotations-toolbox .annotations-head .annotations-title .global-indicator {
+    color: #aa00aa; }
+    .annotations-toolbox .annotations-head .annotations-title .global-indicator:before {
+      font-family: "FontAwesome";
+      display: inline-block;
+      font-style: normal;
+      font-weight: normal;
+      line-height: 1;
+      text-decoration: inherit;
+      content: "\f0e8"; }
 .annotations-toolbox.shift-up .annotations-detail {
   display: block; }
 .annotations-toolbox .annotations-detail {
@@ -81,8 +91,8 @@
     .annotations-toolbox .annotations-detail .checks ul li,
     .annotations-toolbox .annotations-detail .page-types ul li {
       font-weight: bold; }
-  .annotations-toolbox .annotations-detail .checks .no-page-type,
-  .annotations-toolbox .annotations-detail .page-types .no-page-type {
+  .annotations-toolbox .annotations-detail .checks .none,
+  .annotations-toolbox .annotations-detail .page-types .none {
     font-style: italic; }
   .annotations-toolbox .annotations-detail .settings {
     padding: 0.5em; }
@@ -102,10 +112,6 @@ html:not(.page-hide-warnings) .has-warnings,
 html:not(.page-hide-hints) .has-hints,
 .global-warnings {
   margin-bottom: 1em; }
-  html:not(.page-hide-warnings) .has-warnings .annotation:before,
-  html:not(.page-hide-hints) .has-hints .annotation:before,
-  .global-warnings .annotation:before {
-    padding-right: 5px; }
   html:not(.page-hide-warnings) .has-warnings .annotation,
   html:not(.page-hide-hints) .has-hints .annotation,
   .global-warnings .annotation {
@@ -118,10 +124,30 @@ html:not(.page-hide-hints) .has-hints,
   .global-warnings .annotation-hint {
     color: #444444;
     background-color: #ffdd00; }
+    html:not(.page-hide-warnings) .has-warnings .annotation-hint:before,
+    html:not(.page-hide-hints) .has-hints .annotation-hint:before,
+    .global-warnings .annotation-hint:before {
+      font-family: "FontAwesome";
+      display: inline-block;
+      font-style: normal;
+      font-weight: normal;
+      line-height: 1;
+      text-decoration: inherit;
+      content: "\f0f3"; }
   html:not(.page-hide-warnings) .has-warnings .annotation-warning,
   html:not(.page-hide-hints) .has-hints .annotation-warning,
   .global-warnings .annotation-warning {
     background-color: #ff4400; }
+    html:not(.page-hide-warnings) .has-warnings .annotation-warning:before,
+    html:not(.page-hide-hints) .has-hints .annotation-warning:before,
+    .global-warnings .annotation-warning:before {
+      font-family: "FontAwesome";
+      display: inline-block;
+      font-style: normal;
+      font-weight: normal;
+      line-height: 1;
+      text-decoration: inherit;
+      content: "\f071"; }
 
 html:not(.page-hide-hints) .has-hints {
   border: solid 3px #ffdd00; }
@@ -133,24 +159,24 @@ html:not(.page-hide-warnings) .has-warnings {
   border: solid 3px #aa00aa; }
   .global-warnings .annotation {
     background-color: #aa00aa; }
+    .global-warnings .annotation:before {
+      font-family: "FontAwesome";
+      display: inline-block;
+      font-style: normal;
+      font-weight: normal;
+      line-height: 1;
+      text-decoration: inherit;
+      content: "\f0e8"; }
 
-.page-has-hints .annotations-title .fa-bell, .page-has-hints .annotations-title html:not(.page-hide-warnings) .has-warnings .annotation-hint:before, html:not(.page-hide-warnings) .has-warnings .page-has-hints .annotations-title .annotation-hint:before,
-.page-has-hints .annotations-title html:not(.page-hide-hints) .has-hints .annotation-hint:before,
-html:not(.page-hide-hints) .has-hints .page-has-hints .annotations-title .annotation-hint:before,
-.page-has-hints .annotations-title .global-warnings .annotation-hint:before,
-.global-warnings .page-has-hints .annotations-title .annotation-hint:before {
+.page-has-hints .annotations-title .hints-indicator {
   display: inline !important; }
 .page-has-hints .annotations-detail label[for=show_hints] {
   display: inline !important; }
 
-.page-has-warnings .annotations-title .fa-warning, .page-has-warnings .annotations-title html:not(.page-hide-warnings) .has-warnings .annotation-warning:before, html:not(.page-hide-warnings) .has-warnings .page-has-warnings .annotations-title .annotation-warning:before,
-.page-has-warnings .annotations-title html:not(.page-hide-hints) .has-hints .annotation-warning:before,
-html:not(.page-hide-hints) .has-hints .page-has-warnings .annotations-title .annotation-warning:before,
-.page-has-warnings .annotations-title .global-warnings .annotation-warning:before,
-.global-warnings .page-has-warnings .annotations-title .annotation-warning:before {
+.page-has-warnings .annotations-title .warnings-indicator {
   display: inline !important; }
 .page-has-warnings .annotations-detail label[for=show_warnings] {
   display: inline !important; }
 
-.page-has-global-annotations .annotations-title .fa-sitemap, .page-has-global-annotations .annotations-title .global-warnings .annotation, .global-warnings .page-has-global-annotations .annotations-title .annotation {
+.page-has-global-annotations .annotations-title .global-indicator {
   display: inline !important; }

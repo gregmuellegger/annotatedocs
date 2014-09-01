@@ -1,0 +1,20 @@
+@mixin fa-icon($content) {
+  &:before {
+    font-family: "FontAwesome";
+    display: inline-block;
+    font-style: normal;
+    font-weight: normal;
+    line-height: 1;
+    text-decoration: inherit;
+    content: $content;
+  }
+}
+
+// https://fortawesome.github.io/Font-Awesome/icon/bell/
+@mixin icon-bell { @include fa-icon("\f0f3"); }
+
+// https://fortawesome.github.io/Font-Awesome/icon/warning/
+@mixin icon-warning { @include fa-icon("\f071"); }
+
+// https://fortawesome.github.io/Font-Awesome/icon/sitemap/
+@mixin icon-sitemap { @include fa-icon("\f0e8"); }
