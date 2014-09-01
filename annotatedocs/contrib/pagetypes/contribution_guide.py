@@ -1,4 +1,7 @@
+import re
+
 from ... import Check, Hint, PageType, metrics
+from ...utils import normalize_document_path
 from ..metrics.emailaddress import EmailAddress
 from ..metrics.references import References
 from ..metrics.sectiontitle import SectionTitleContainsKeywords
@@ -132,3 +135,21 @@ class ContributionGuide(PageType):
         HasReportIssueSection,
         HasLinkToBugTracker,
     ]
+
+    name_regex = re.compile(
+        r'''
+        (^|/)
+        (contribut(?![eo]rs?|ed))
+        # Only catch the filename if the `contribute` is not part of a
+        # directory name. We usually would like to catch all parts of the
+        # contribution information if it's part of a directory, however we are
+        # not able to fit those pieces together into one big check. So we limit
+        # ourselves to single-document contribution guides.
+        [^/]*$
+        ''', re.VERBOSE)
+
+    def match(self, document):
+        name = normalize_document_path(document.name)
+        if self.name_regex.search(name):
+            return 0.8
+        return 0
