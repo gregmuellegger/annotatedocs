@@ -30,22 +30,18 @@ class PEP8Metric(Metric):
     You can access ``node['pep8_warnings']`` to retrieve all gathered warnings
     and errors. These are stored as dicts with the following keys:
 
-    line_number
+    ``'line_number'``
         The line in which the warning was detected.
 
-    offset
+    ``'offset'``
         The column in which the warning was detected.
 
-    errorno
+    ``'errorno'``
         The pep8 error/warning number like E122, W292, etc.
 
-    text
+    ``'text'``
         The error/warning message as text.
     """
-
-    required_metrics = Metric.required_metrics + [
-        NodeType,
-    ]
 
     report_class = MetricReport
 
