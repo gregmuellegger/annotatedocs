@@ -100,6 +100,21 @@ def require(*metrics):
 
 
 class Metric(MetricRequirementMixin, object):
+    def get_id(self):
+        """
+        Return qualified name for this metric class.
+
+        The return (will be in the future) used to determine if the metric was
+        already applied. An ID for a metric will be only applied once. If you
+        want to be able to apply the same metric twice to a document, you must
+        return different IDs (e.g. return a stringifyed timestamp with high
+        precision).
+        """
+        # TODO: Make use of this method.
+        return '.'.join((
+            self.__module__,
+            self.__class__.__name__))
+
     def limit(self, nodeset):
         '''
         Subclasses can limit down the nodeset they want to be applied against.
