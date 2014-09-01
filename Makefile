@@ -1,8 +1,10 @@
 THEME_PATH = annotatedocs/themes/annotatedocs
 SASS_PATH = $(THEME_PATH)/static/sass
 
+.PHONY: docs
 
-all: sampledocs
+
+all: test docs
 
 clean:
 	rm -rf tests/sampledocs/_build/
@@ -18,3 +20,6 @@ sampledocs: css
 
 test:
 	py.test
+
+docs:
+	cd docs/ && make html
