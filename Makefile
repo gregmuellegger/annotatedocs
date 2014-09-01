@@ -4,7 +4,7 @@ SASS_PATH = $(THEME_PATH)/static/sass
 .PHONY: docs
 
 
-all: test docs
+all: theme test docs
 
 clean:
 	rm -rf tests/sampledocs/_build/
