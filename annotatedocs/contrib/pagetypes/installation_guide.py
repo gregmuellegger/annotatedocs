@@ -146,6 +146,6 @@ class InstallationGuide(PageType):
 
     def match(self, document):
         name = normalize_document_path(document.name)
-        if self.name_regex.match(name):
+        if self.name_regex.search(name):
             return 0.8
         return 0
