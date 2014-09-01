@@ -4,8 +4,7 @@ import re
 from ... import Check, PageType, Hint, metrics
 from ...utils import normalize_document_path
 from ..metrics.references import References
-from ..metrics.sectiontitle import SectionTitle
-from ..metrics.stemmer import Stemmer
+from ..metrics.sectiontitle import SectionTitleContainsKeywords
 
 
 __all__ = ('InstallationGuide',)
@@ -34,32 +33,14 @@ class HasCodeListing(Check):
             document.annotate(self.annotation)
 
 
-@metrics.require(Stemmer, SectionTitle, metrics.NodeType)
-class DependenciesSection(metrics.Metric):
-    keywords = set(Stemmer.stem(
-        """
-        require
-        requirements
-        dependencies
-        dependency
-        """))
-
-    def has_dependency_title(self, node):
-        title = node['title']
-        for word in title['stemmed_words']:
-            if word in self.keywords:
-                return True
-
-    def limit(self, nodeset):
-        """
-        Only return sections with a title that contains a keyword that
-        indicates that this is a section that talks about dependencies.
-        """
-        nodeset = nodeset.filter(type='section', title__exists=True)
-        return nodeset.filter(self.has_dependency_title)
-
-    def apply(self, node, document):
-        node['is_dependency_section'] = True
+class DependenciesSection(SectionTitleContainsKeywords):
+    flag_name = 'is_dependency_section'
+    keywords = (
+        'require',
+        'requirements',
+        'dependencies',
+        'dependency',
+    )
 
 
 @metrics.require(DependenciesSection)
@@ -135,7 +116,6 @@ class HasNextLink(Check):
             internal_refs = last_section.nodeset.filter(is_internal_ref=True)
             if internal_refs.count() == 0:
                 last_section.annotate(self.annotation)
-
 
 
 class InstallationGuide(PageType):
