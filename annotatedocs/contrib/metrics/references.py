@@ -26,11 +26,33 @@ class References(Metric):
         if 'refuri' in node.node.attributes:
             uri = node.node.attributes['refuri']
             node['refuri'] = uri
+
             result = urlparse(uri)
             # Consider it an external URI if it contains a domain.
             is_external_ref = bool(result.netloc)
             # Consider it an internal URI if it does not contain a domain.
             is_internal_ref = not bool(result.netloc)
+
+            if result.scheme:
+                node['uri_scheme'] = result.scheme
+            if result.netloc:
+                node['uri_netloc'] = result.netloc
+            if result.path:
+                node['uri_path'] = result.path
+            if result.params:
+                node['uri_params'] = result.params
+            if result.query:
+                node['uri_query'] = result.query
+            if result.fragment:
+                node['uri_fragment'] = result.fragment
+            if result.username:
+                node['uri_username'] = result.username
+            if result.password:
+                node['uri_password'] = result.password
+            if result.hostname:
+                node['uri_hostname'] = result.hostname
+            if result.port:
+                node['uri_port'] = result.port
 
         node['is_internal_ref'] = is_internal_ref
         node['is_external_ref'] = is_external_ref
