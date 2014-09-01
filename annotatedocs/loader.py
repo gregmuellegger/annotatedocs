@@ -106,7 +106,6 @@ class Loader(object):
         self.setup_project()
         if self.use_virtualenv():
             self.setup_virtualenv()
-            self.activate_virtualenv()
         else:
             log.debug('Not using virtualenv for this build.')
 
@@ -139,7 +138,9 @@ class Loader(object):
         raise NotImplementedError('Needs to be implemented by subclass.')
 
     def use_virtualenv(self):
-        raise NotImplementedError('Needs to be implemented by subclass.')
+        return bool(
+            self.shall_install_python_package() or
+            self.get_pip_requirements_file())
 
     def setup_virtualenv(self):
         virtualenv_dir = self.get_virtualenv_dir()
@@ -152,6 +153,9 @@ class Loader(object):
             sh.virtualenv(virtualenv_dir)
 
             pip = self.get_virtualenv_command('pip')
+
+            # Activate virtualenv. Needs to come before setup.py install.
+            self.activate_virtualenv()
 
             # Install Sphinx.
             if self.dependencies:
@@ -180,11 +184,12 @@ class Loader(object):
         else:
             log.debug('Using existing virtualenv: {}'.format(
                 virtualenv_dir))
+            self.activate_virtualenv()
 
     def activate_virtualenv(self):
         virtuelenv_dir = self.get_virtualenv_dir()
         activate_this = os.path.join(virtuelenv_dir, 'bin', 'activate_this.py')
-        execfile(activate_this)
+        execfile(activate_this, {'__file__': activate_this})
 
     def build(self):
         with tempdir() as doctrees_dir:
@@ -311,9 +316,6 @@ class VCSLoader(Loader):
         else:
             return False
 
-    def use_virtualenv(self):
-        return self.shall_install_python_package()
-
     def get_pip_requirements_file(self):
         return None
 
@@ -377,10 +379,12 @@ class ReadTheDocsLoader(VCSLoader):
         return project_data
 
     def shall_install_python_package(self):
-        return self.project_data['use_virtualenv']
-
-    def use_virtualenv(self):
-        return self.project_data['use_virtualenv']
+        project_dir = self.get_project_dir()
+        setup_py_file = os.path.join(project_dir, 'setup.py')
+        if os.path.exists(setup_py_file):
+            return True
+        else:
+            return False
 
     def get_pip_requirements_file(self):
         return self.project_data['requirements_file']
