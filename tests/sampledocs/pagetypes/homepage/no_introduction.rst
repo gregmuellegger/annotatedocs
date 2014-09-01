@@ -11,7 +11,7 @@ Contents:
 .. toctree::
    :maxdepth: 2
 
-   /installation
+   /pagetypes/installation_guide/no_code_listing
 
 
 Here comes a longer paragraph **after** the table of contents. This shouldn't
@@ -24,4 +24,3 @@ Indices and tables
 * :ref:`genindex`
 * :ref:`modindex`
 * :ref:`search`
-

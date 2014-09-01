@@ -3,6 +3,7 @@ import re
 
 from ... import Check, PageType, Hint, metrics
 from ...utils import normalize_document_path
+from ..metrics.stemmer import Stemmer
 
 
 __all__ = ('InstallationGuide',)
@@ -31,25 +32,108 @@ class HasCodeListing(Check):
             document.annotate(self.annotation)
 
 
+@metrics.require(Stemmer, metrics.NodeType, metrics.SectionTitle)
+class DependenciesSection(metrics.Metric):
+    keywords = set(Stemmer.stem(
+        """
+        require
+        requirements
+        dependencies
+        dependency
+        """))
+
+    def has_dependency_title(self, node):
+        title = node['title']
+        for word in title['stemmed_words']:
+            if word in self.keywords:
+                return True
+
+    def limit(self, nodeset):
+        """
+        Only return sections with a title that contains a keyword that
+        indicates that this is a section that talks about dependencies.
+        """
+        nodeset = nodeset.filter(type='section', title__exists=True)
+        return nodeset.filter(self.has_dependency_title)
+
+    def apply(self, node, document):
+        node['is_dependency_section'] = True
+
+
+@metrics.require(DependenciesSection)
+class HasDependencies(Check):
+    """
+    Make sure the installation guide has a section about the requirements for
+    this project.
+    """
+
+    annotation = Hint(
+        """
+        Seems like there is no section about which requirments this project
+        depends on. Consider adding a specific section on this topic since your
+        users usually want to be aware of what depnencies need to be satisfied
+        before installting this project.
+        """)
+
+    def limit(self, nodeset):
+        return nodeset.filter(is_dependency_section=True)
+
+    def check(self, nodeset, document):
+        if nodeset.count() == 0:
+            document.annotate(self.annotation)
+
+
+@metrics.require(
+    DependenciesSection,
+    metrics.References)
+class LinkToDependencies(Check):
+    """
+    If the page has a section about requirements, make sure that it contains
+    links to external sources (the requirements homepages).
+    """
+
+    annotation = Hint(
+        """
+        This section about the dependencies does not contain a link to
+        URL outside of this documentation. If you list dependencies make sure
+        that you also supply a link to their project pages.
+        """)
+
+    def limit(self, nodeset):
+        return nodeset.filter(is_dependency_section=True)
+
+    def check(self, nodeset, document):
+        for section in nodeset:
+            external_refs = section.nodeset.filter(is_external_ref=True)
+            if external_refs.count() == 0:
+                section.annotate(self.annotation)
+
+
+@metrics.require(metrics.NodeType)
 class HasNextLink(Check):
     """
     Make sure that the page has a 'what comes next' section with a link to
     another internal document.
     """
 
+    annotation = Hint(
+        """
+        You don't link to another page in the documentation in this last
+        section. Make sure that the users knows where to go next after
+        completing this installation guide. Consider including a "What to read
+        next" link.
+        """)
 
-class HasRequirements(Check):
-    """
-    Make sure the installation guide has a section about the requirements for
-    this project.
-    """
+    def limit(self, nodeset):
+        return nodeset.filter(type='section')
 
+    def check(self, nodeset, document):
+        last_section = nodeset.last()
+        if last_section:
+            internal_refs = last_section.nodeset.filter(is_internal_ref=True)
+            if internal_refs.count() == 0:
+                last_section.annotate(self.annotation)
 
-class LinkToRequirements(Check):
-    """
-    If the page has a section about requirements, make sure that it contains
-    links to external sources (the requirements homepages).
-    """
 
 
 class InstallationGuide(PageType):
@@ -57,8 +141,8 @@ class InstallationGuide(PageType):
 
     checks = [
         HasCodeListing,
-        HasRequirements,
-        LinkToRequirements,
+        HasDependencies,
+        LinkToDependencies,
         HasNextLink,
     ]
 
