@@ -1,5 +1,6 @@
 import os
 import shutil
+import traceback
 
 from click.testing import CliRunner
 
@@ -30,4 +31,6 @@ def test_build_of_sampledocs():
             docs['root']
         ])
 
-        assert result.exit_code == 0
+        if result.exit_code != 0:
+            lines = traceback.format_exception(*result.exc_info)
+            assert result.exit_code == 0, ''.join(lines)
