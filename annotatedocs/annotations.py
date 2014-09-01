@@ -20,11 +20,11 @@ class Annotation(object):
         return unicode(self.get_message())
 
     def format(self, *args, **kwargs):
-        '''
-        This is way to emulate a unicode object, somehow.
+        """
+        This is way to emulate a unicode's format method, somehow.
         We remember the actual format arguments and use it when
         ``get_message()`` is called.
-        '''
+        """
         format_args = list(self.format_args) + list(args)
         format_kwargs = self.format_kwargs.copy()
         format_kwargs.update(kwargs)

@@ -1,15 +1,13 @@
-from . import Metric, PartOfSpeech
+from ... import Metric, metrics
 from ..nlp import get_passive_voice_phrases
+from .partofspeech import PartOfSpeech
 
 
 __all__ = ('PassiveVoicePhrases',)
 
 
+@metrics.require(PartOfSpeech)
 class PassiveVoicePhrases(Metric):
-    required_metrics = Metric.required_metrics + [
-        PartOfSpeech,
-    ]
-
     def limit(self, nodeset):
         return nodeset.filter(type='paragraph',
                               part_of_speech_tags__exists=True)

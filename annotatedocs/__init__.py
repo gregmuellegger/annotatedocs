@@ -1,8 +1,8 @@
-from annotatedocs.bundle import Bundle
-from annotatedocs.checks import Check
-from annotatedocs.metrics import Metric
-from annotatedocs.page_types import PageType
-from annotatedocs.annotations import Annotation, Hint, Warning
+from annotatedocs.bundles import *
+from annotatedocs.checks import *
+from annotatedocs.metrics import *
+from annotatedocs.pagetypes import *
+from annotatedocs.annotations import *
 
 
 __version__ = '0.1.0'

@@ -1,16 +1,12 @@
-from . import Check
-from ..annotations import Hint
+from ... import Check, Hint, metrics
 from ..metrics import WordStats
 
 
 __all__ = ('LongParagraph',)
 
 
+@metrics.require(WordStats)
 class LongParagraph(Check):
-    required_metrics = [
-        WordStats,
-    ]
-
     threshold = 10
     threshold_string = 'ten'
     message = Hint(

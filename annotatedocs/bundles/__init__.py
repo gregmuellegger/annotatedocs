@@ -1,8 +1,4 @@
-from ..bundle import Bundle
-from ..page_types import BasicPage, InstallationGuide
+from .base import *
 
 
-default_bundle = Bundle(
-    InstallationGuide,
-    BasicPage,
-)
+default_bundle = Bundle()

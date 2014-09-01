@@ -1,15 +1,12 @@
-from . import Metric, NodeType
+from ... import metrics, Metric, NodeType
 from ..nlp import get_pos_tags
 
 
 __all__ = ('PartOfSpeech',)
 
 
+@metrics.require(NodeType)
 class PartOfSpeech(Metric):
-    required_metrics = Metric.required_metrics + [
-        NodeType,
-    ]
-
     def limit(self, nodeset):
         return nodeset.filter(type='paragraph')
 

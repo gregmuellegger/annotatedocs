@@ -1,16 +1,12 @@
-from . import Check
-from ..annotations import Hint
-from ..metrics import Metric, WordStats
+from ... import Check, Hint, Metric, metrics
+from ..metrics.wordstats import WordStats
 
 
 __all__ = ('LongSection',)
 
 
+@metrics.require(WordStats)
 class SectionWordCount(Metric):
-    required_metrics = Metric.required_metrics + [
-        WordStats,
-    ]
-
     def limit(self, nodeset):
         return nodeset.filter(type='section')
 
@@ -25,15 +21,12 @@ class SectionWordCount(Metric):
         node['section_word_count'] = sum(word_counts)
 
 
+@metrics.require(SectionWordCount)
 class LongSection(Check):
 
     # 1000 words are about the number of words that fit on two printed book
     # pages. After that we should split up the section if possible.
     threshold = 1100
-
-    required_metrics = Check.required_metrics + [
-        SectionWordCount,
-    ]
 
     message = Hint(
         'This section is quite long, it contains about {rough_word_count} '

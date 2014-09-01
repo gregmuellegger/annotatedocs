@@ -1,4 +1,4 @@
-from annotatedocs.page_types import PageType
+from .base import PageType
 
 
 __all__ = ('NamedPage',)

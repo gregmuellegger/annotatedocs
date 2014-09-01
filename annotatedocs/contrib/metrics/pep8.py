@@ -1,8 +1,7 @@
 from __future__ import absolute_import
 import pep8
 
-from .base import Metric
-from .nodetype import NodeType
+from ... import Metric, NodeType, metrics
 
 
 __all__ = ('PEP8Metric',)
@@ -23,6 +22,7 @@ class MetricReport(pep8.BaseReport):
         super(MetricReport, self).error(line_number, offset, text, check)
 
 
+@metrics.require(NodeType)
 class PEP8Metric(Metric):
     """
     Will add pep8 error and warnings to the node.

@@ -1,18 +1,36 @@
 from __future__ import division
 
-from .base import PageType
-from ..metrics import Stemmer
+from ... import Check, PageType, metrics
+from ..metrics.stemmer import Stemmer
 
 
 __all__ = ('InstallationGuide',)
 
 
+class HasNextLink(Check):
+    """
+    Make sure that the page has a 'what comes next' section with a link to
+    another internal document.
+    """
+
+
+class HasRequirements(Check):
+    """
+    Make sure the installation guide has a section about the requirements for
+    this project.
+    """
+
+
+class LinkToRequirements(Check):
+    """
+    If the page has a section about requirements, make sure that it contains
+    links to external sources (the requirements homepages).
+    """
+
+
+@metrics.require(Stemmer)
 class InstallationGuide(PageType):
     name = 'installation guide'
-
-    required_metrics = PageType.required_metrics + [
-        Stemmer,
-    ]
 
     required_words = [
         'Installation',

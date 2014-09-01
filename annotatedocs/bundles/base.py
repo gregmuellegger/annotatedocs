@@ -1,4 +1,4 @@
-from .utils import instantiate
+from ..utils import instantiate
 
 
 __all__ = ('Bundle',)

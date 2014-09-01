@@ -1,5 +1,4 @@
-from . import Check
-from ..annotations import Annotation
+from ... import Check, Annotation
 from ..metrics.pep8 import PEP8Metric
 
 

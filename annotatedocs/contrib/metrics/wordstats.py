@@ -2,21 +2,17 @@ from __future__ import division
 
 import nltk
 
-from .base import Metric
-from .nodetype import NodeType
+from ... import Metric, NodeType, metrics
 
 
 __all__ = ('WordStats',)
 
 
+@metrics.require(NodeType)
 class WordStats(Metric):
     '''
     Adds some statistics like average word length, sentence length etc.
     '''
-
-    required_metrics = Metric.required_metrics + [
-        NodeType,
-    ]
 
     def limit(self, nodeset):
         return nodeset.filter(is_content_type=True)

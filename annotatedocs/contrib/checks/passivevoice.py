@@ -1,16 +1,12 @@
-from . import Check
-from ..annotations import Hint
-from ..metrics import PassiveVoicePhrases
+from ... import Check, Hint, metrics
+from ..metrics.passivevoicephrases import PassiveVoicePhrases
 
 
 __all__ = ('PassiveVoice',)
 
 
+@metrics.require(PassiveVoicePhrases)
 class PassiveVoice(Check):
-    required_metrics = Check.required_metrics + [
-        PassiveVoicePhrases,
-    ]
-
     message = Hint(
         'The paragraph contains the phrase {phrase} which is put in passive '
         'voice. Consider making this active voice to be clearer about what '

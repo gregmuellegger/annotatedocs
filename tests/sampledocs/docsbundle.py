@@ -1,8 +1,10 @@
-from annotatedocs.bundle import Bundle
-from annotatedocs.checks import LongSection, PassiveVoice
-from annotatedocs.checks.pep8 import PEP8Compliance
-from annotatedocs.page_types import NamedPage, InstallationGuide
-from annotatedocs.page_types.homepage import Homepage
+from annotatedocs import Bundle, NamedPage
+
+from annotatedocs.contrib.checks.longsection import LongSection
+from annotatedocs.contrib.checks.passivevoice import PassiveVoice
+from annotatedocs.contrib.checks.pep8 import PEP8Compliance
+from annotatedocs.contrib.pagetypes.homepage import Homepage
+from annotatedocs.contrib.pagetypes.installation_guide import InstallationGuide
 
 
 def page_type_for_path(path, page_type_class):
