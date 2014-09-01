@@ -173,6 +173,15 @@ class NodeSet(object):
             return node
         return None
 
+    def last(self):
+        '''
+        Returns last item of nodeset or ``None`` if the nodeset is empty.
+        '''
+        try:
+            return list(self)[-1]
+        except IndexError:
+            return None
+
     def children(self):
         def is_children(node):
             return any(
