@@ -230,18 +230,17 @@ class DocumentData(object):
     def __init__(self, node, document=None):
         self.document = document
         self.root_node = node
-        self._init_data()
-
-    def _init_data(self):
         self._data = {}
 
-        def init_node(node):
-            self._data[node] = self.node_data_class(node, document_data=self)
-
-        walk(self.root_node, init_node)
+    def _init_node(self, node):
+        self._data[node] = self.node_data_class(node, document_data=self)
 
     def __getitem__(self, node):
-        return self._data[node]
+        try:
+            return self._data[node]
+        except KeyError:
+            self._init_node(node)
+            return self._data[node]
 
     def get(self, node, key, default=NO_DEFAULT):
         '''
