@@ -10,7 +10,11 @@ from .loader import get_loader
 
 @click.command()
 @click.argument('docs', type=click.Path(), default='.')
-@click.option('-b', '--build-dir', type=click.Path(), default=None,
+@click.option('-b', '--bundle', default=None,
+              help=(
+                  'Set the bundle that shall be used to annotate the given '
+                  'documentation.'))
+@click.option('--build-dir', type=click.Path(), default=None,
               help=(
                   'Set build directory in which the annotated html shall be '
                   'placed.'))
@@ -23,7 +27,7 @@ from .loader import get_loader
 @click.option('--debug/--no-debug', is_flag=True, help='Show debug output.')
 @click.option('-w', is_flag=True,
               help='Open the build documentation in your default webbrowser.')
-def main(docs, build_dir, tmp_dir, recreate, debug, w):
+def main(docs, bundle, build_dir, tmp_dir, recreate, debug, w):
     '''
     annotatedocs analyzes your sphinx-based documentation and provides helpful
     feedback about the quality and possible improvements.
@@ -58,7 +62,10 @@ def main(docs, build_dir, tmp_dir, recreate, debug, w):
             if recreate:
                 loader.cleanup()
             loader.setup()
-            index_file = loader.build()
+            confoverrides = {}
+            if bundle:
+                confoverrides['annotatedocs_bundle'] = bundle
+            index_file = loader.build(confoverrides=confoverrides)
 
             if w:
                 webbrowser.open(index_file)

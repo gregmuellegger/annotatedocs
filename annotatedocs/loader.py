@@ -191,14 +191,15 @@ class Loader(object):
         activate_this = os.path.join(virtuelenv_dir, 'bin', 'activate_this.py')
         execfile(activate_this, {'__file__': activate_this})
 
-    def build(self):
+    def build(self, confoverrides=None):
         with tempdir() as doctrees_dir:
             app = AnnotatedSphinx(
                 srcdir=unicode(self.get_docs_dir()),
                 confdir=unicode(self.get_docs_dir()),
                 outdir=unicode(self.get_build_dir()),
                 doctreedir=unicode(doctrees_dir),
-                buildername='html')
+                buildername='html',
+                confoverrides=confoverrides or {})
             app.build(force_all=True)
             index_file = os.path.join(
                 self.get_build_dir(),

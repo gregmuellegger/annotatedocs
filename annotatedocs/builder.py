@@ -7,6 +7,7 @@ from sphinx.builders.html import StandaloneHTMLBuilder
 from sphinx.util.console import darkgreen
 
 from .document import DocumentStructure
+from .bundles import Bundle
 
 
 class AnnotatedHTMLTranslator(HTMLTranslator):
@@ -104,17 +105,28 @@ class AnnotatedHTMLBuilder(StandaloneHTMLBuilder):
         bundle_conf = getattr(
             self.app.config,
             'annotatedocs_bundle',
-            'annotatedocs.bundles.default_bundle')
+            self.app.bundle_override)
 
         if isinstance(bundle_conf, basestring):
             path_bits = bundle_conf.split('.')
-            bundle_name = path_bits.pop(-1)
+            bundle_name = str(path_bits.pop(-1))
             module_name = '.'.join(path_bits)
             bundle_module = __import__(module_name, globals(), locals(),
-                                       [bundle_name], -1)
-            bundle = getattr(bundle_module, bundle_name)
+                                       fromlist=[bundle_name])
+            try:
+                bundle = getattr(bundle_module, bundle_name)
+            except AttributeError:
+                raise TypeError(
+                    'The given bundle {0} cannot be '
+                    'imported.'.format(repr(bundle_conf)))
         else:
             bundle = bundle_conf
+
+        # Sanity check.
+        if not isinstance(bundle, Bundle):
+            raise TypeError(
+                'The given bundle {0} is not a subclass of '
+                'Bundle.'.format(repr(bundle_conf)))
         return bundle
 
     def prepare_annotation_data(self, doctrees_by_docname):
@@ -142,6 +154,7 @@ class AnnotatedHTMLBuilder(StandaloneHTMLBuilder):
 class AnnotatedSphinx(Sphinx):
     def __init__(self, *args, **kwargs):
         confoverrides = kwargs.pop('confoverrides', {})
+        self.bundle_override = confoverrides.get('annotatedocs_bundle', None)
 
         # TODO: We force the 'annotatedocs' theme here. We should change the
         # theme so that all other themes are supported.
