@@ -23,9 +23,17 @@ class cd(object):
 
 class tempdir(object):
     """
-    Context manager for changing the current working directory
+    Context manager that creates a temporary directory which is deleted
+    afterwards.
 
-    Inspired by: http://stackoverflow.com/a/13197763/199848
+    >>> with tempdir() as path:
+    ...     filename = os.path.join(path, 'foo')
+    ...     with open('foo', 'w') as f:
+    ...         f.write('bar')
+    ...     assert os.path.exists(filename)
+    ...
+    >>> os.path.exists(filename)
+    False
     """
 
     def __enter__(self):

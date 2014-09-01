@@ -78,6 +78,17 @@ class Document(object):
     nodeset_class = NodeSet
 
     def __init__(self, node, bundle, name=None, structure=None):
+        """
+        Parameters
+        ----------
+        node : docutils.node.Node
+        bundle : annotatedocs.bundle.Bundle
+        name : str, optional
+            The filename of the source document without the file suffix. So
+            `name` will be ``contribution/license`` if the source document was
+            ``contribution/license.rst``.
+        structure : `DocumentStructure`, optional
+        """
         self.node = node
         self.bundle = bundle
         self.name = name
@@ -100,12 +111,19 @@ class Document(object):
 
     @property
     def nodeset(self):
+        """
+        Returns
+        -------
+        NodeSet
+        """
         return self.nodeset_class([self[self.node]])
 
     def __getitem__(self, node):
         return self.data[node]
 
     def apply_metric(self, metric):
+        # TODO: Move this into the metric so that it can decide itself if it
+        # want's to be applied multiple times or not.
         if metric in self.applied_metrics:
             return
 
@@ -174,11 +192,6 @@ class NodeData(dict):
     def nodeset(self):
         return NodeSet([self])
 
-    # Alias methods that pass the calls through to the docutils node instance.
-
-    def astext(self):
-        return self.node.astext()
-
     @property
     def attributes(self):
         """
@@ -186,6 +199,15 @@ class NodeData(dict):
         on this node. This is the case for Text nodes for example.
         """
         return getattr(self.node, 'attributes', {})
+
+    @property
+    def class_name(self):
+        return self.node.__class__.__name__
+
+    # Alias methods that pass the calls through to the docutils node instance.
+
+    def astext(self):
+        return self.node.astext()
 
 
 class DocumentData(object):

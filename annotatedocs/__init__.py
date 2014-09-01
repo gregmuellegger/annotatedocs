@@ -1,4 +1,5 @@
 from annotatedocs.bundle import Bundle
+from annotatedocs.checks import Check
 from annotatedocs.metrics import Metric
 from annotatedocs.page_types import PageType
 from annotatedocs.annotations import Annotation, Hint, Warning

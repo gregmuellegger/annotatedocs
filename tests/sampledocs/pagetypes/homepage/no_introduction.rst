@@ -14,6 +14,10 @@ Contents:
    /installation
 
 
+Here comes a longer paragraph **after** the table of contents. This shouldn't
+be recognized as a introduction.
+
+
 Indices and tables
 ==================
 

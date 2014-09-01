@@ -1,15 +1,3 @@
-def filter_nodes(nodes, check):
-    result = []
-    to_check = nodes[:]
-    while to_check:
-        current_node = to_check.pop()
-        if check(current_node):
-            if current_node not in result:
-                result.append(current_node)
-        to_check.extend(reversed(current_node.children))
-    return result
-
-
 def lookup(check):
     def _lookup(key, test_value):
         def _test_node(node):
@@ -130,7 +118,10 @@ class NodeSet(object):
         return self.count() >= 1
 
     def __len__(self):
-        return list(self.__iter__()).__len__()
+        count = 0
+        for node in self:
+            count += 1
+        return count
 
     def filter(self, *args, **kwargs):
         '''
@@ -178,11 +169,9 @@ class NodeSet(object):
         '''
         Returns first item of nodeset or None if the nodeset is empty.
         '''
-
-        try:
-            return list(self)[0]
-        except IndexError:
-            return None
+        for node in self:
+            return node
+        return None
 
     def children(self):
         def is_children(node):
@@ -215,6 +204,9 @@ class NodeSet(object):
 
         return [get_values(node) for node in self]
 
+    def none(self):
+        return self.__class__([])
+
     def _accept_node(self, node):
         for filter_func in self._filters:
             if not filter_func(node):
@@ -222,18 +214,18 @@ class NodeSet(object):
         return True
 
     def _filter_nodes(self, nodes, check, include_children_of_matched=True):
-        result = []
+        found = []
         to_check = nodes[:]
         while to_check:
             current_node = to_check.pop()
             matched = False
             if check(current_node):
                 matched = True
-                if current_node not in result:
-                    result.append(current_node)
+                if current_node not in found:
+                    found.append(current_node)
+                    yield current_node
             if include_children_of_matched or matched:
                 to_check.extend(reversed(current_node.children))
-        return result
 
     def _evaluate(self, nodes):
         '''
@@ -242,4 +234,6 @@ class NodeSet(object):
         return self._filter_nodes(nodes, self._accept_node)
 
     def __iter__(self):
-        return iter(self._evaluate(self.root_nodes))
+        for item in self._evaluate(self.root_nodes):
+            yield item
+        raise StopIteration
