@@ -38,7 +38,10 @@ class HasContactInformation(Check):
 
     annotation = Hint(
         """
-        No contact information included.
+        There is no contact information included. Please either mention if you
+        are using a mailing list or have a link ready to an IRC channel where
+        users can ask question. Links to a twitter account or an email address
+        might are not as good but better than no concat information.
         """)
 
     mailing_list_keywords = (
@@ -73,7 +76,9 @@ class HasReportIssueSection(Check):
 
     annotation = Hint(
         """
-        No report issue section -> bad.
+        It seems like there is no section about how to create a bug report.
+        Consider creating a seperate section for this in order to have a go-to
+        place for your users when they found a bug.
         """)
 
     def limit(self, nodeset):
