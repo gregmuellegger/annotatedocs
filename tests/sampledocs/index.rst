@@ -19,4 +19,5 @@ Contents:
    basicpage/passivevoice
    basicpage/pep8compliance
    pagetypes/homepage/*
+   pagetypes/contribution_guide/*
    pagetypes/installation_guide/*
