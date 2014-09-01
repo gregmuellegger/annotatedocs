@@ -92,9 +92,9 @@ def require(*metrics):
             raise TypeError(
                 "require() can only be applied to classes and instance "
                 "methods.")
-            decorated_class.required_metrics = (
-                list(decorated_class.required_metrics) +
-                list(metrics))
+        decorated_class.required_metrics = (
+            list(decorated_class.required_metrics) +
+            list(metrics))
         return decorated
     return decorator
 
