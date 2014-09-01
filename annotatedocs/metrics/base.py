@@ -1,4 +1,4 @@
-__all__ = ('MetricRequirementMixin', 'Metric')
+__all__ = ('require', 'MetricRequirementMixin', 'Metric')
 
 
 class MetricRequirementMixin(object):
@@ -51,6 +51,52 @@ class MetricRequirementMixin(object):
                     continue
                 dependencies.append(dependency)
         return dependencies + class_metrics
+
+
+def require(*metrics):
+    """
+    Usage:
+
+        from annotatedocs import metrics, Check
+
+        @metrics.require(metrics.NodeType)
+        class MyCheck(Check):
+            ...
+
+    Or:
+
+        from annotatedocs import metrics, Check
+
+        class MyCheck(Check):
+            @metrics.require(metrics.NodeType)
+            def check(self, nodeset, document):
+                ...
+
+    Is equivalent to:
+
+        from annotatedocs import metrics, Check
+
+        class MyCheck(Check):
+            required_metrics = Check.required_metrics + [
+                metrics.NodeType
+            ]
+    """
+    def decorator(decorated):
+        # If it's a class.
+        if isinstance(decorated, type):
+            decorated_class = decorated
+        # If it's a method.
+        elif hasattr(decorated, 'im_class'):
+            decorated_class = decorated.im_class
+        else:
+            raise TypeError(
+                "require() can only be applied to classes and instance "
+                "methods.")
+            decorated_class.required_metrics = (
+                list(decorated_class.required_metrics) +
+                list(metrics))
+        return decorated
+    return decorator
 
 
 class Metric(MetricRequirementMixin, object):
