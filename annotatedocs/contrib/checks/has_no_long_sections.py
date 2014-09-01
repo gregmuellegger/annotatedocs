@@ -37,7 +37,7 @@ class HasNoLongSections(Check):
 
     def check(self, nodeset, document):
         for section in nodeset.filter(section_word_count__gt=300):
-            title = section.nodeset.filter(type='headline').first()
+            title = section.nodeset.filter(type='title').first()
             if title:
                 rough_word_count = section['section_word_count']
                 rough_word_count = round(rough_word_count, -2)

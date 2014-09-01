@@ -5,20 +5,24 @@ __all__ = ('NodeType',)
 
 
 class NodeType(Metric):
-    '''
+    """
     Tries to categorize nodes based on their docutils class.
 
     The goal is to make querying via the NodeSet easier.
-    '''
+    """
 
     class_to_type = {
         'Text': 'text',
-        'paragraph': 'paragraph',
-        'title': 'headline',
-        # TODO make this mapping complete.
+        # TODO: make this mapping complete.
     }
 
-    content_types = ['headline', 'paragraph']
+    content_types = ['title', 'paragraph']
+
+    # TODO: Integrate all attributes.
+    # Name of node attributes that should be added to the node data.
+    attributes = [
+        'language',
+    ]
 
     def apply(self, node, document):
         class_name = node.node.__class__.__name__
@@ -28,8 +32,8 @@ class NodeType(Metric):
         if node_type in self.content_types:
             node['is_content_type'] = True
 
-        # TODO: Integrate all attributes.
         if hasattr(node.node, 'attributes'):
-            attributes = node.node.attributes
-            if 'language' in attributes:
-                node['language'] = attributes['language']
+            for attribute_name in self.attributes:
+                attrs = node.node.attributes
+                if attribute_name in attrs:
+                    node[attribute_name] = attrs[attribute_name]
