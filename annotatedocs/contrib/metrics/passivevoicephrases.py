@@ -14,4 +14,6 @@ class PassiveVoicePhrases(Metric):
 
     def apply(self, node, document):
         tags = node['part_of_speech_tags']
-        node['passive_voice_phrases'] = get_passive_voice_phrases(tags)
+        phrases = get_passive_voice_phrases(tags)
+        if phrases:
+            node['passive_voice_phrases'] = phrases
