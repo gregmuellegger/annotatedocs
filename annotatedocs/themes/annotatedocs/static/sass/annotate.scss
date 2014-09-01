@@ -96,6 +96,7 @@ $annotate-global-warning-color: #aa00aa;
       margin-bottom: 0.25em;
     }
 
+    .checks,
     .page-types {
       ul {
         padding: 0.5em;
@@ -106,7 +107,7 @@ $annotate-global-warning-color: #aa00aa;
         }
       }
 
-      .no-page-type {
+      .none {
         font-style: italic;
       }
     }

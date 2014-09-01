@@ -13,7 +13,14 @@ class Check(MetricRequirementMixin, object):
     nodes.
     """
 
-    message = None
+    name = None
+    annotation = None
+
+    def __init__(self, annotation=None):
+        self.annotation = annotation or self.annotation
+
+    def __unicode__(self):
+        return unicode(self.name or self.__class__.__name__)
 
     def limit(self, nodeset):
         '''

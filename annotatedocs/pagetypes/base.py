@@ -48,3 +48,5 @@ class PageType(MetricRequirementMixin, object):
             nodeset = document.nodeset.all()
             nodeset = check.limit(nodeset)
             check.check(nodeset, document)
+
+            document.applied_checks.add(check)

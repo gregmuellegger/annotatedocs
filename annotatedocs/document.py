@@ -100,6 +100,7 @@ class Document(object):
         self.page_types = None
         self.is_analyzed = False
         self.applied_metrics = set()
+        self.applied_checks = set()
 
     def __repr__(self):
         return '<{class_name}: {name}>'.format(

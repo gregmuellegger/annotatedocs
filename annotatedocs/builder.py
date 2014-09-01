@@ -135,6 +135,7 @@ class AnnotatedHTMLBuilder(StandaloneHTMLBuilder):
         context['document_structure'] = self.document_structure
         context['document'] = document
         context['page_types'] = document.page_types
+        context['checks'] = document.applied_checks
         return context
 
 

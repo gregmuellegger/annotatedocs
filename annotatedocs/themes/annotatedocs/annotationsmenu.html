@@ -18,7 +18,18 @@
                 {% endfor %}
             </ul>
             {% else %}
-            <span class="no-page-type">Couldn't find a matching page type for this document.</span>
+            <span class="none">Couldn't find a matching page type.</span>
+            {% endif %}
+        </section>
+
+        <section class="checks">
+            {% if checks %}
+            These checks were applied:
+            <ul>
+                {% for check in checks %}
+                <li>{{ check|escape }}</li>
+                {% endfor %}
+            </ul>
             {% endif %}
         </section>
 

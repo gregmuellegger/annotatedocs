@@ -74,11 +74,14 @@
   .annotations-toolbox .annotations-detail .section-title {
     font-weight: bold;
     margin-bottom: 0.25em; }
+  .annotations-toolbox .annotations-detail .checks ul,
   .annotations-toolbox .annotations-detail .page-types ul {
     padding: 0.5em;
     list-style-type: circle; }
+    .annotations-toolbox .annotations-detail .checks ul li,
     .annotations-toolbox .annotations-detail .page-types ul li {
       font-weight: bold; }
+  .annotations-toolbox .annotations-detail .checks .no-page-type,
   .annotations-toolbox .annotations-detail .page-types .no-page-type {
     font-style: italic; }
   .annotations-toolbox .annotations-detail .settings {
