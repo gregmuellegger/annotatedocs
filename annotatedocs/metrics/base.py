@@ -61,5 +61,10 @@ class Metric(MetricRequirementMixin, object):
         '''
         return nodeset.all()
 
+    def apply_to_document(self, document):
+        nodeset = document.nodeset
+        for node in self.limit(nodeset):
+            self.apply(node, document)
+
     def apply(self, node, document):
         raise NotImplementedError('Needs to be implemented by subclass.')

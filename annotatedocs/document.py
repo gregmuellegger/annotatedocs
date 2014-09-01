@@ -128,12 +128,8 @@ class Document(object):
             return
 
         # Finally apply metric.
-        metric = instantiate(metric)
-        nodeset = self.nodeset.all()
-        nodeset = metric.limit(nodeset)
-        for node in nodeset:
-            metric.apply(node, self)
-
+        metric_instance = instantiate(metric)
+        metric_instance.apply_to_document(self)
         self.applied_metrics.add(metric)
 
     def apply_metrics(self, metrics):
