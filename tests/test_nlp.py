@@ -1,6 +1,6 @@
 import pytest
 
-from annotatedocs.nlp import get_pos_tags, get_passive_voice_phrases
+from annotatedocs.contrib.nlp import get_pos_tags, get_passive_voice_phrases
 
 
 class TestGetPassiveVoicePhrases(object):
@@ -75,6 +75,16 @@ class TestGetPassiveVoicePhrases(object):
         assert len(phrases) == 0
 
         text = "The chicken crossed the road."
+        phrases = self.get_phrases(text)
+        assert len(phrases) == 0
+
+    def test_past_participle_after_other_verb(self):
+        text = """
+            The goal of this release was to fix cross-platform compatibility,
+            primarily Windows bugs that had crept in during the addition of new
+            features.
+        """
+
         phrases = self.get_phrases(text)
         assert len(phrases) == 0
 

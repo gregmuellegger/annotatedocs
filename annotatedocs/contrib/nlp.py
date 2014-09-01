@@ -69,6 +69,8 @@ def index_passive_voice_phrase(tags, position):
         for next_pos, next_tag in enumerate(tags[start:]):
             if next_tag[1] == VERB_PAST_PARTICIBLE:
                 return next_pos + to_be_word_length
+            if next_tag[1].startswith('V'):
+                return -1
     return -1
 
 
