@@ -201,6 +201,16 @@ class NodeData(dict):
     def class_name(self):
         return self.node.__class__.__name__
 
+    @property
+    def parent(self):
+        """
+        Return the `NodeData` instance for the parent of the docutils node.
+        """
+        if self.node.parent:
+            return self.document_data[self.node.parent]
+        else:
+            return None
+
     # Alias methods that pass the calls through to the docutils node instance.
 
     def astext(self):
