@@ -34,7 +34,7 @@ setup(
         'click>=2.0',
         'Logbook',
         'nltk',
-        'textblob',
+        'textblob>=0.8',
         'textblob-aptagger',
         'sh',
         'slumber',
