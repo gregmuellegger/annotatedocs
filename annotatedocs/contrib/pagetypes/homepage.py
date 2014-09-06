@@ -66,7 +66,7 @@ class HasIntroduction(Check):
             return
 
         paragraphs = nodeset.filter(before_toc=True, sentence_count__exists=True)
-        sentences = sum(lambda p: p['sentence_count'], paragraphs)
+        sentences = sum(map(lambda p: p['sentence_count'], paragraphs))
 
         if sentences < 4:
             document.annotate(self.annotation)
