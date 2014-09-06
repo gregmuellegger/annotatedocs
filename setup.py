@@ -40,9 +40,10 @@ setup(
         'slumber',
         'Sphinx',
         'virtualenv',
+        'pep8',
         'sphinx_rtd_theme',
     ],
-    entry_points = {
+    entry_points={
         'sphinx_themes': [
             'path = annotatedocs.themes:get_path',
         ]
