@@ -1,6 +1,6 @@
 from ... import Bundle, PageType
 
-from ..checks.passivevoice import NoPassiveVoiceUsed
+from ..checks.no_passive_voice_used import NoPassiveVoiceUsed
 from ..checks.is_pep8_compliant import IsPEP8Compliant
 from ..pagetypes.homepage import Homepage
 from ..pagetypes.contribution_guide import ContributionGuide

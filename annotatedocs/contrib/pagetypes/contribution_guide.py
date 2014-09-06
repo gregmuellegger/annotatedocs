@@ -89,7 +89,7 @@ class HasReportIssueSection(Check):
             document.annotate(self.annotation)
 
 
-@metrics.require(References)
+@metrics.require(ReportIssueSection, References)
 class HasLinkToBugTracker(Check):
     """
     Make sure that the page has a link to the projects bug tracker.
@@ -105,7 +105,7 @@ class HasLinkToBugTracker(Check):
         'issue',
         'bug',
         'tracker',
-        'report',
+        'ticket',
     )
 
     def limit(self, nodeset):

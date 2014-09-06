@@ -1,11 +1,11 @@
 from ... import Check, Hint, Metric, metrics
-from ..metrics.wordstats import WordStats
+from ..metrics.textstats import TextStats
 
 
 __all__ = ('HasNoLongSections',)
 
 
-@metrics.require(WordStats)
+@metrics.require(TextStats)
 class SectionWordCount(Metric):
     def limit(self, nodeset):
         return nodeset.filter(type='section')

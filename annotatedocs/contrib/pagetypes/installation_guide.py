@@ -44,7 +44,7 @@ class DependenciesSection(SectionTitleContainsKeywords):
 
 
 @metrics.require(DependenciesSection)
-class HasDependencies(Check):
+class HasDependenciesSection(Check):
     """
     Make sure the installation guide has a section about the requirements for
     this project.
@@ -92,7 +92,7 @@ class LinkToDependencies(Check):
                 section.annotate(self.annotation)
 
 
-@metrics.require(metrics.NodeType)
+@metrics.require(metrics.NodeType, References)
 class HasNextLink(Check):
     """
     Make sure that the page has a 'what comes next' section with a link to
@@ -123,7 +123,7 @@ class InstallationGuide(PageType):
 
     checks = [
         HasCodeListing,
-        HasDependencies,
+        HasDependenciesSection,
         LinkToDependencies,
         HasNextLink,
     ]

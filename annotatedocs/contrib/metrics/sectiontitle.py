@@ -23,6 +23,8 @@ class SectionTitle(Metric):
         title = titles.first()
         if title:
             node['title'] = title
+            title['is_section_title'] = True
+            title['section'] = node
 
 
 @require(NodeType, SectionTitle, Stemmer)
@@ -39,12 +41,14 @@ class SectionTitleContainsKeywords(Metric):
     keywords = []
     flag_name = None
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, flag_name=None, keywords=None, *args, **kwargs):
+        self.flag_name = flag_name or self.flag_name
+        self.keywords = keywords or self.keywords
         super(SectionTitleContainsKeywords, self).__init__(*args, **kwargs)
         self.stemmed_keywords = set(Stemmer.stem(' '.join(self.keywords)))
         assert self.flag_name, "`flag_name` attribute is not set."
 
-    def title_contains_one_keyword(self, node):
+    def title_contains_keyword(self, node):
         title = node['title']
         for word in title['stemmed_words']:
             if word in self.stemmed_keywords:
@@ -56,7 +60,7 @@ class SectionTitleContainsKeywords(Metric):
         indicates that this is a section that talks about dependencies.
         """
         nodeset = nodeset.filter(type='section', title__exists=True)
-        return nodeset.filter(self.title_contains_one_keyword)
+        return nodeset.filter(self.title_contains_keyword)
 
     def apply(self, node, document):
         node[self.flag_name] = True
