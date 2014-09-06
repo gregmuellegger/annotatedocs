@@ -6,8 +6,8 @@ from sphinx.writers.html import HTMLTranslator
 from sphinx.builders.html import StandaloneHTMLBuilder
 from sphinx.util.console import darkgreen
 
+from . import bundles
 from .document import DocumentStructure
-from .bundles import Bundle
 
 
 class AnnotatedHTMLTranslator(HTMLTranslator):
@@ -107,7 +107,10 @@ class AnnotatedHTMLBuilder(StandaloneHTMLBuilder):
             'annotatedocs_bundle',
             self.app.bundle_override)
 
-        if isinstance(bundle_conf, basestring):
+        if bundle_conf is None:
+            bundle = bundles.noop
+
+        elif isinstance(bundle_conf, basestring):
             path_bits = bundle_conf.split('.')
             bundle_name = str(path_bits.pop(-1))
             module_name = '.'.join(path_bits)
@@ -123,7 +126,7 @@ class AnnotatedHTMLBuilder(StandaloneHTMLBuilder):
             bundle = bundle_conf
 
         # Sanity check.
-        if not isinstance(bundle, Bundle):
+        if not isinstance(bundle, bundles.Bundle):
             raise TypeError(
                 'The given bundle {0} is not a subclass of '
                 'Bundle.'.format(repr(bundle_conf)))
