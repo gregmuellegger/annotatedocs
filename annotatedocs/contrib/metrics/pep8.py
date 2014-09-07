@@ -27,7 +27,7 @@ class PEP8Metric(Metric):
     """
     Will add pep8 error and warnings to the node.
 
-    You can access ``node['pep8_warnings']`` to retrieve all gathered warnings
+    You can access ``node['pep8_errors']`` to retrieve all gathered warnings
     and errors. These are stored as dicts with the following keys:
 
     ``'line_number'``
@@ -65,4 +65,4 @@ class PEP8Metric(Metric):
         if file_errors:
             errors = sorted(checker.report.errors,
                             key=lambda e: e['line_number'])
-            node['pep8_warnings'] = errors
+            node['pep8_errors'] = errors

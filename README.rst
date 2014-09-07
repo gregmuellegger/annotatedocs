@@ -30,13 +30,14 @@ HTML. Therefore call the URL that is displayed at the end of the build in your
 browser to view the documentation and have a look at the added annotations.
 
 .. note::
-    ``annoatedocs`` can only operate on sphinx based documentation so far.
+    ``annotatedocs`` can only operate on sphinx based documentation so far.
 
 Todos
 -----
 
 The roadmap includes adding a few more features, which are:
 
+* Full documentation.
 * Add an output format option to the command line tool to get an output in JSON
   for easier further processing.
 * Support and testing for more Python versions (mainly Python 3).
